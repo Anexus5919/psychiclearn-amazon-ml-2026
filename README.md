@@ -7,7 +7,7 @@ Private team repository. For each Source-1 business record, the task is to find 
 | Run | What changed | Validation F0.5 (held-out train) | Public LB |
 |---|---|---|---|
 | Run 2 | Baseline: word/char TF-IDF retrieval → LightGBM → exclusive assignment + rank thresholds | 0.9515 (US 0.973, India 0.920) | **0.931** |
-| Run 3 | + learned Indic→Latin transliteration (India), + learned pruning to small candidate sets | in progress | – |
+| Run 3 | + learned Indic→Latin transliteration (India), + learned pruning (54 → 18 candidates per S1) | 0.9613 (US 0.973, India 0.944) | **0.941** |
 
 ## Layout
 
@@ -16,7 +16,7 @@ Private team repository. For each Source-1 business record, the task is to find 
 | `submission/` | Final-package structure. `code/business_entity_resolution/` is the version that produced the LB 0.931 file. `output/` stays empty here: the data files are too big for git. |
 | `dev_run3/` | Newer code: transliteration (`ber/translit.py`) and learned pruning (`ber/prune.py`). It moves into `submission/` once validated. |
 | `analysis/` | `ER_Solution_Blueprint.md` (full problem analysis and plan) plus the EDA scripts and their outputs |
-| `results/` | Run 2's `matching_results.tsv` (gzipped) |
+| `results/` | Gzipped `matching_results.tsv` of runs 2 and 3, plus run 3's validation report and pruning rule |
 | `HANDOFF.md` | Current state, paths and next steps |
 
 ## Running
