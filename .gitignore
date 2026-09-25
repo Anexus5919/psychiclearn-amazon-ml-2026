@@ -1,0 +1,10 @@
+# never commit data, caches or large artefacts
+dataset/
+*.parquet
+*.npy
+*.tsv
+!**/tests/**/*.tsv
+__pycache__/
+*.pyc
+.venv/
+work*/

@@ -1,0 +1,222 @@
+
+==========================================================================================
+train\train_source1.tsv: 2,206,821 rows  (read 0.3s)
+  unique entity_id: 2,206,821
+  id prefixes: [('S1-', 2206821)]
+  id length min/max: 6/12
+  country: [('US', 1323633), ('India', 883188)]
+  empty name         :         0 ( 0.00%)
+  empty address      :         0 ( 0.00%)
+  addr has 'null' tok:        43 ( 0.00%)
+  name has 'null' tok:        20 ( 0.00%)
+  name len q[0.01, 0.25, 0.5, 0.75, 0.99]: [8.0, 18.0, 24.0, 30.0, 42.0]
+  addr len q[0.01, 0.25, 0.5, 0.75, 0.99]: [22.0, 33.0, 41.0, 70.0, 124.0]
+  name Devanagari        :         0 ( 0.00%)
+  name other Indic       :         0 ( 0.00%)
+  name Latin accents     :         0 ( 0.00%)
+  name all-UPPER name    :         0 ( 0.00%)
+  name digit in name     :    35,585 ( 1.61%)
+  name url/www/.com      :         0 ( 0.00%)
+  name junk <<,>>,--,|,*,#:     1,403 ( 0.06%)
+  name brackets ()[]{}   :    45,492 ( 2.06%)
+  name & in name         :   111,897 ( 5.07%)
+  name DBA/aka/t-a       :        30 ( 0.00%)
+  addr Devanagari        :         0 ( 0.00%)
+  addr other Indic       :         0 ( 0.00%)
+  addr 6-digit (PIN)     :     1,831 ( 0.08%)
+  addr 5-digit (ZIP/CP)  :   147,543 ( 6.69%)
+  addr ZIP+4             :         3 ( 0.00%)
+  addr 'near'/'opp'      :   117,137 ( 5.31%)
+  addr PO Box            :        33 ( 0.00%)
+  addr Unit/Apt/Suite    :   195,173 ( 8.84%)
+  addr all-UPPER addr    :         4 ( 0.00%)
+  addr starts w/ state/abbr:    84,634 ( 3.84%)
+  distinct lower(name): 1,538,804  | names used >1x: 178,080  | max reuse: 253
+  top names: [('primary care group', 253), ('ear nose & throat group', 251), ('pediatric group', 222), ('womens health group', 220), ('physical therapy group', 218), ('pediatric dental group', 216), ('behavioral health group', 215), ('chiropractic group', 209), ('orthopedic group', 208), ('eye group', 207), ('dental group', 205), ('family group', 204)]
+  top 60 name tokens: [('limited', 522340), ('private', 432503), ('llc', 355736), ('inc', 238309), ('ltd', 148599), ('pvt', 121462), ('&', 111583), ('india', 61241), ('and', 57296), ('s', 55579), ('c', 53874), ('care', 53136), ('l', 49290), ('of', 44497), ('associates', 42985), ('group', 40520), ('llp', 39726), ('center', 35433), ('partners', 35084), ('corp', 34792), ('services', 31238), ('p', 28976), ('health', 28264), ('d', 27887), ('co', 27692), ('clinic', 27586), ('pc', 27166), ('solutions', 26415), ('global', 25611), ('trading', 22805), ('international', 20843), ('brothers', 20712), ('technologies', 20619), ('pllc', 20531), ('industries', 18789), ('enterprises', 17902), ('medicine', 17769), ('foundation', 17759), ('ventures', 17198), ('lp', 16563), ('consultants', 15890), ('pediatric', 15611), ('corporation', 14372), ('technology', 14331), ('trust', 14046), ('management', 14040), ('company', 13876), ('systems', 13783), ('tech', 13755), ('dental', 13410), ('blue', 13324), ('products', 13301), ('marketing', 13057), ('green', 13023), ('engineering', 12739), ('golden', 12417), ('family', 12299), ('institute', 12084), ('silver', 12083), ('consultancy', 11808)]
+  top 60 addr tokens: [('road', 467379), ('no', 445587), ('delhi', 322098), ('street', 309808), ('drive', 221567), ('unit', 208326), ('maharashtra', 192382), ('avenue', 189840), ('nagar', 166622), ('floor', 163098), ('city', 149120), ('1', 141744), ('west', 134222), ('tx', 133225), ('mumbai', 128042), ('new', 116403), ('pradesh', 116200), ('lane', 108042), ('c', 105884), ('ny', 102396), ('2', 98836), ('a', 97548), ('nc', 94845), ('b', 89575), ('plot', 87854), ('oh', 85254), ('bangalore', 84333), ('o', 75824), ('uttar', 75822), ('il', 75766), ('karnataka', 70523), ('3', 64057), ('tamil', 63596), ('nadu', 63587), ('s', 60754), ('south', 60501), ('court', 60437), ('tn', 59722), ('va', 59674), ('pune', 58181), ('gujarat', 58151), ('near', 57394), ('ma', 57388), ('bengal', 57214), ('az', 56551), ('telangana', 56251), ('kolkata', 55040), ('flat', 53590), ('h', 52691), ('park', 51825), ('in', 51740), ('north', 51371), ('colony', 50192), ('east', 49791), ('sector', 49590), ('hyderabad', 49223), ('4', 49130), ('main', 47479), ('county', 46778), ('p', 45044)]
+
+==========================================================================================
+train\train_source2.tsv: 5,034,616 rows  (read 0.7s)
+  unique entity_id: 5,034,616
+  id prefixes: [('S2-', 5034616)]
+  id length min/max: 6/12
+  country: [('US', 3016817), ('India', 2017799)]
+  empty name         :         0 ( 0.00%)
+  empty address      :   168,967 ( 3.36%)
+  addr has 'null' tok:    87,997 ( 1.75%)
+  name has 'null' tok:        45 ( 0.00%)
+  name len q[0.01, 0.25, 0.5, 0.75, 0.99]: [8.0, 19.0, 25.0, 31.0, 48.0]
+  addr len q[0.01, 0.25, 0.5, 0.75, 0.99]: [0.0, 30.0, 37.0, 61.0, 118.0]
+  name Devanagari        :   269,424 ( 5.35%)
+  name other Indic       :   204,921 ( 4.07%)
+  name Latin accents     :   290,263 ( 5.77%)
+  name all-UPPER name    :   951,594 (18.90%)
+  name digit in name     :   255,636 ( 5.08%)
+  name url/www/.com      :   201,268 ( 4.00%)
+  name junk <<,>>,--,|,*,#:    96,074 ( 1.91%)
+  name brackets ()[]{}   :   388,644 ( 7.72%)
+  name & in name         :   209,076 ( 4.15%)
+  name DBA/aka/t-a       :        69 ( 0.00%)
+  addr Devanagari        :   277,523 ( 5.51%)
+  addr other Indic       :   199,998 ( 3.97%)
+  addr 6-digit (PIN)     :    42,360 ( 0.84%)
+  addr 5-digit (ZIP/CP)  :   338,150 ( 6.72%)
+  addr ZIP+4             :     8,411 ( 0.17%)
+  addr 'near'/'opp'      :   228,776 ( 4.54%)
+  addr PO Box            :    50,309 ( 1.00%)
+  addr Unit/Apt/Suite    :    32,492 ( 0.65%)
+  addr all-UPPER addr    : 3,191,104 (63.38%)
+  addr starts w/ state/abbr:   191,054 ( 3.79%)
+  distinct lower(name): 4,287,470  | names used >1x: 285,556  | max reuse: 397
+  top names: [('primary care', 397), ('physical therapy', 386), ('womens health', 369), ('urgent care', 366), ('behavioral health', 363), ('earnosethroat.com', 348), ('internal medicine', 346), ('pediatric dental', 337), ('pediatric dentistry', 335), ('ear nose & throat', 253), ('the dent', 246), ('main street', 237)]
+  top 60 name tokens: [('ट', 534406), ('llc', 532379), ('limited', 532213), ('private', 532072), ('inc', 403240), ('ltd', 401133), ('र', 338267), ('ल', 305832), ('ड', 258714), ('म', 250547), ('प', 244575), ('स', 233750), ('&', 209831), ('com', 202135), ('center', 196536), ('pvt', 190499), ('l', 178436), ('इव', 157955), ('partners', 155487), ('services', 147335), ('corp', 142833), ('group', 141458), ('co', 140870), ('s', 139400), ('क', 123700), ('ட', 119493), ('and', 118901), ('c', 116377), ('india', 114478), ('holdings', 97734), ('ట', 93979), ('of', 89949), ('care', 89801), ('ಟ', 89214), ('ज', 79970), ('associates', 74001), ('ট', 68968), ('llp', 65179), ('corporation', 63182), ('न', 62943), ('ટ', 60885), ('ग', 60722), ('p', 57185), ('service', 55790), ('फ', 54914), ('ర', 54238), ('health', 51747), ('d', 51532), ('य', 50957), ('ರ', 50245), ('enterprises', 49677), ('व', 49123), ('র', 48689), ('industries', 48349), ('lp', 48301), ('clinic', 46701), ('ர', 45462), ('റ', 45077), ('ventures', 44637), ('m', 44543)]
+  top 60 addr tokens: [('no', 1117851), ('road', 680160), ('delhi', 491311), ('street', 338282), ('st', 334979), ('rd', 331804), ('floor', 320613), ('maharashtra', 320257), ('1', 303779), ('nagar', 303686), ('city', 302519), ('tx', 292328), ('dr', 283704), ('a', 279082), ('c', 264121), ('र', 244503), ('2', 241186), ('ny', 225422), ('ave', 224083), ('new', 219725), ('pradesh', 218034), ('drive', 215993), ('nc', 207828), ('west', 204167), ('b', 193791), ('avenue', 193720), ('h', 190414), ('mumbai', 189688), ('oh', 187361), ('plot', 181171), ('il', 166069), ('o', 163883), ('ल', 133832), ('null', 131796), ('va', 131283), ('tn', 131055), ('bangalore', 127831), ('3', 126647), ('uttar', 126547), ('ma', 125906), ('s', 124882), ('az', 124432), ('d', 122580), ('lane', 118733), ('karnataka', 118414), ('kolkata', 115634), ('ln', 115539), ('in', 112958), ('door', 112775), ('near', 111956), ('ct', 110709), ('block', 110183), ('मह', 107011), ('ष', 107011), ('ट', 107011), ('park', 106769), ('tamil', 106035), ('nadu', 106025), ('4', 102259), ('g', 99527)]
+
+==========================================================================================
+train\train_source3.tsv: 5,285,603 rows  (read 1.3s)
+  unique entity_id: 5,285,603
+  id prefixes: [('S3-', 5285603)]
+  id length min/max: 5/12
+  country: [('US', 3170056), ('India', 2115547)]
+  empty name         :         0 ( 0.00%)
+  empty address      :   175,916 ( 3.33%)
+  addr has 'null' tok:    87,272 ( 1.65%)
+  name has 'null' tok:        33 ( 0.00%)
+  name len q[0.01, 0.25, 0.5, 0.75, 0.99]: [6.0, 18.0, 25.0, 31.0, 50.0]
+  addr len q[0.01, 0.25, 0.5, 0.75, 0.99]: [0.0, 35.0, 42.0, 54.0, 115.0]
+  name Devanagari        :   158,003 ( 2.99%)
+  name other Indic       :   120,521 ( 2.28%)
+  name Latin accents     :   328,213 ( 6.21%)
+  name all-UPPER name    :   156,231 ( 2.96%)
+  name digit in name     :   270,847 ( 5.12%)
+  name url/www/.com      :   210,923 ( 3.99%)
+  name junk <<,>>,--,|,*,#:   100,364 ( 1.90%)
+  name brackets ()[]{}   :   423,243 ( 8.01%)
+  name & in name         :   216,937 ( 4.10%)
+  name DBA/aka/t-a       :    73,421 ( 1.39%)
+  addr Devanagari        :   275,861 ( 5.22%)
+  addr other Indic       :   199,917 ( 3.78%)
+  addr 6-digit (PIN)     :    42,607 ( 0.81%)
+  addr 5-digit (ZIP/CP)  :   354,531 ( 6.71%)
+  addr ZIP+4             :     8,717 ( 0.16%)
+  addr 'near'/'opp'      :   182,143 ( 3.45%)
+  addr PO Box            :    49,852 ( 0.94%)
+  addr Unit/Apt/Suite    :   225,889 ( 4.27%)
+  addr all-UPPER addr    :       813 ( 0.02%)
+  addr starts w/ state/abbr:    76,508 ( 1.45%)
+  distinct lower(name): 4,579,083  | names used >1x: 284,995  | max reuse: 421
+  top names: [('primary care', 421), ('physical therapy', 399), ('pediatric dental', 393), ('womens health', 379), ('urgent care', 377), ('pediatric dentistry', 361), ('behavioral health', 330), ('pediatric', 321), ('internal medicine', 319), ('earnosethroat.com', 307), ('the dent', 254), ('straight edge', 252)]
+  top 60 name tokens: [('limited', 677666), ('private', 644512), ('llc', 575634), ('ltd', 430703), ('inc', 422989), ('ट', 299305), ('center', 223999), ('pvt', 221763), ('&', 217652), ('com', 211884), ('र', 189238), ('ल', 171654), ('l', 169646), ('services', 168960), ('partners', 164944), ('s', 148730), ('group', 146709), ('co', 145168), ('ड', 145023), ('corp', 141308), ('म', 140591), ('प', 137123), ('स', 130928), ('and', 122990), ('india', 116708), ('c', 116210), ('holdings', 99784), ('care', 96849), ('of', 93123), ('a', 90708), ('इव', 88517), ('llp', 77774), ('associates', 77467), ('d', 74725), ('क', 69634), ('ட', 66682), ('service', 64578), ('p', 60273), ('corporation', 58592), ('enterprises', 57243), ('the', 54937), ('industries', 53854), ('health', 53821), ('ట', 52629), ('trading', 52176), ('ಟ', 50271), ('ventures', 49701), ('m', 49331), ('clinic', 48559), ('solutions', 46859), ('lp', 46119), ('ज', 44723), ('global', 42746), ('pc', 40689), ('ট', 38777), ('public', 37789), ('brothers', 36504), ('technologies', 35985), ('pediatric', 35377), ('न', 35025)]
+  top 60 addr tokens: [('no', 1073672), ('road', 627839), ('new', 479832), ('delhi', 447113), ('street', 357908), ('city', 356110), ('st', 332829), ('north', 332787), ('1', 330088), ('rd', 326949), ('mh', 321439), ('texas', 294389), ('nagar', 286210), ('a', 282230), ('dr', 281734), ('floor', 279175), ('mumbai', 270185), ('c', 268129), ('2', 249614), ('र', 241958), ('drive', 241808), ('york', 229412), ('ave', 224234), ('carolina', 216511), ('unit', 213067), ('avenue', 212298), ('dl', 201588), ('west', 197033), ('b', 196252), ('ohio', 188318), ('h', 187225), ('virginia', 175701), ('bangalore', 174359), ('illinois', 167075), ('plot', 166148), ('o', 162958), ('south', 141060), ('ल', 133908), ('3', 131694), ('tennessee', 131571), ('null', 130844), ('massachusetts', 125878), ('arizona', 125250), ('lane', 125161), ('washington', 123281), ('up', 123269), ('pune', 122749), ('d', 121845), ('ka', 119788), ('ln', 116442), ('s', 113156), ('tn', 111295), ('door', 109841), ('indiana', 109815), ('hyderabad', 107208), ('मह', 105802), ('ष', 105802), ('ट', 105802), ('4', 104204), ('east', 100468)]
+
+==========================================================================================
+test\test_source1.tsv: 1,732,544 rows  (read 0.3s)
+  unique entity_id: 1,732,544
+  id prefixes: [('S1-', 1732544)]
+  id length min/max: 6/12
+  country: [('India', 809986), ('US', 663106), ('France', 259452)]
+  empty name         :         0 ( 0.00%)
+  empty address      :         0 ( 0.00%)
+  addr has 'null' tok:        41 ( 0.00%)
+  name has 'null' tok:         9 ( 0.00%)
+  name len q[0.01, 0.25, 0.5, 0.75, 0.99]: [8.0, 18.0, 24.0, 29.0, 42.0]
+  addr len q[0.01, 0.25, 0.5, 0.75, 0.99]: [24.0, 36.0, 50.0, 74.0, 126.0]
+  name Devanagari        :         0 ( 0.00%)
+  name other Indic       :         0 ( 0.00%)
+  name Latin accents     :    40,788 ( 2.35%)
+  name all-UPPER name    :         3 ( 0.00%)
+  name digit in name     :    20,207 ( 1.17%)
+  name url/www/.com      :         0 ( 0.00%)
+  name junk <<,>>,--,|,*,#:       709 ( 0.04%)
+  name brackets ()[]{}   :    62,573 ( 3.61%)
+  name & in name         :    86,917 ( 5.02%)
+  name DBA/aka/t-a       :        37 ( 0.00%)
+  addr Devanagari        :         0 ( 0.00%)
+  addr other Indic       :         0 ( 0.00%)
+  addr 6-digit (PIN)     :       974 ( 0.06%)
+  addr 5-digit (ZIP/CP)  :    75,922 ( 4.38%)
+  addr ZIP+4             :         3 ( 0.00%)
+  addr 'near'/'opp'      :   107,261 ( 6.19%)
+  addr PO Box            :        39 ( 0.00%)
+  addr Unit/Apt/Suite    :   104,642 ( 6.04%)
+  addr all-UPPER addr    :         2 ( 0.00%)
+  addr starts w/ state/abbr:    42,582 ( 2.46%)
+  distinct lower(name): 1,238,244  | names used >1x: 130,383  | max reuse: 205
+  top names: [('bordeaux club sarl', 205), ('nantes club sarl', 157), ('lille club sarl', 147), ('urgent care group', 123), ('lille club sas', 122), ('bordeaux club sas', 118), ('nantes club sas', 117), ('bordeaux amicale sarl', 116), ('ear nose & throat group', 112), ('internal medicine group', 111), ('eye group', 110), ('pediatric dental group', 110)]
+  top 60 name tokens: [('limited', 478664), ('private', 396691), ('llc', 178366), ('ltd', 134645), ('inc', 119199), ('pvt', 110860), ('&', 86580), ('sarl', 73486), ('india', 55882), ('sas', 52393), ('llp', 36039), ('care', 31613), ('and', 28486), ('s', 28211), ('services', 27190), ('c', 26648), ('of', 25562), ('associates', 24326), ('l', 24270), ('group', 24052), ('club', 22931), ('solutions', 22300), ('co', 22051), ('france', 20809), ('corp', 20283), ('partners', 20103), ('trading', 20006), ('center', 19191), ('brothers', 18704), ('global', 18634), ('de', 18094), ('technologies', 17483), ('international', 17185), ('eurl', 16980), ('clinic', 16581), ('industries', 14973), ('health', 14777), ('foundation', 14640), ('p', 14466), ('amicale', 14389), ('enterprises', 14103), ('d', 13918), ('centre', 13834), ('pc', 13639), ('ventures', 13396), ('sa', 12871), ('consultants', 12829), ('union', 12477), ('tech', 12462), ('technology', 12097), ('management', 11216), ('marketing', 11171), ('ecole', 10995), ('systems', 10890), ('maison', 10862), ('du', 10803), ('consultancy', 10780), ('developers', 10723), ('sasu', 10721), ('trust', 10634)]
+  top 60 addr tokens: [('no', 408232), ('road', 327563), ('delhi', 294052), ('de', 262915), ('maharashtra', 176366), ('rue', 170893), ('street', 170361), ('nagar', 151771), ('floor', 148792), ('avenue', 128808), ('1', 126647), ('la', 120709), ('west', 119315), ('mumbai', 117783), ('drive', 111421), ('unit', 108776), ('pradesh', 106155), ('city', 105595), ('france', 102341), ('hauts', 101717), ('new', 100451), ('c', 95981), ('2', 91625), ('a', 86971), ('nouvelle', 85313), ('aquitaine', 85268), ('b', 80459), ('plot', 80338), ('bangalore', 78465), ('loire', 72838), ('pays', 72812), ('o', 69451), ('uttar', 69321), ('tx', 66519), ('karnataka', 65298), ('3', 63217), ('lane', 59575), ('tamil', 58753), ('nadu', 58735), ('s', 54356), ('pune', 53497), ('gujarat', 53423), ('bengal', 52776), ('south', 52611), ('near', 52262), ('telangana', 51551), ('kolkata', 50913), ('ny', 50836), ('4', 49643), ('flat', 48791), ('h', 48033), ('nc', 47858), ('colony', 45737), ('sector', 45476), ('hyderabad', 45043), ('d', 44533), ('north', 43804), ('bordeaux', 43676), ('5', 43018), ('east', 42365)]
+
+==========================================================================================
+test\test_source2.tsv: 4,887,273 rows  (read 1.3s)
+  unique entity_id: 4,887,273
+  id prefixes: [('S2-', 4887273)]
+  id length min/max: 6/12
+  country: [('India', 2312565), ('US', 1871330), ('France', 703378)]
+  empty name         :         0 ( 0.00%)
+  empty address      :   129,408 ( 2.65%)
+  addr has 'null' tok:    70,323 ( 1.44%)
+  name has 'null' tok:        19 ( 0.00%)
+  name len q[0.01, 0.25, 0.5, 0.75, 0.99]: [8.0, 19.0, 25.0, 32.0, 49.0]
+  addr len q[0.01, 0.25, 0.5, 0.75, 0.99]: [0.0, 32.0, 43.0, 67.0, 120.0]
+  name Devanagari        :   309,103 ( 6.32%)
+  name other Indic       :   237,503 ( 4.86%)
+  name Latin accents     :   381,551 ( 7.81%)
+  name all-UPPER name    :   854,999 (17.49%)
+  name digit in name     :   190,009 ( 3.89%)
+  name url/www/.com      :   156,040 ( 3.19%)
+  name junk <<,>>,--,|,*,#:    71,858 ( 1.47%)
+  name brackets ()[]{}   :   407,606 ( 8.34%)
+  name & in name         :   208,608 ( 4.27%)
+  name DBA/aka/t-a       :        90 ( 0.00%)
+  addr Devanagari        :   318,369 ( 6.51%)
+  addr other Indic       :   232,204 ( 4.75%)
+  addr 6-digit (PIN)     :    27,308 ( 0.56%)
+  addr 5-digit (ZIP/CP)  :   228,808 ( 4.68%)
+  addr ZIP+4             :     5,495 ( 0.11%)
+  addr 'near'/'opp'      :   263,591 ( 5.39%)
+  addr PO Box            :    31,697 ( 0.65%)
+  addr Unit/Apt/Suite    :    37,644 ( 0.77%)
+  addr all-UPPER addr    : 2,452,030 (50.17%)
+  addr starts w/ state/abbr:   118,781 ( 2.43%)
+  distinct lower(name): 4,207,077  | names used >1x: 268,103  | max reuse: 302
+  top names: [('cc', 302), ('pc', 197), ('urgent care', 197), ('womens health', 196), ('lc', 194), ('internal medicine', 181), ('behavioral health', 181), ('primary care', 177), ('pediatric dentistry', 177), ('ac', 175), ('bordeaux club', 175), ('sc', 174)]
+  top 60 name tokens: [('limited', 635458), ('ट', 623624), ('private', 605302), ('ltd', 428477), ('र', 396211), ('ल', 352470), ('llc', 320494), ('ड', 298853), ('म', 290292), ('स', 287067), ('प', 279141), ('inc', 251099), ('pvt', 218877), ('&', 209092), ('इव', 179232), ('com', 156773), ('s', 150190), ('क', 146635), ('center', 145218), ('group', 143965), ('sarl', 140708), ('ட', 138349), ('services', 135050), ('india', 134038), ('l', 132399), ('partners', 128659), ('co', 128348), ('corp', 116611), ('holdings', 110628), ('ట', 108594), ('ಟ', 106245), ('sas', 99186), ('ज', 98883), ('llp', 84674), ('ট', 80247), ('न', 75852), ('and', 75142), ('ग', 72576), ('c', 72542), ('ટ', 70210), ('france', 67654), ('enterprises', 66531), ('industries', 66319), ('care', 64864), ('फ', 64387), ('of', 64253), ('ర', 63429), ('ventures', 61372), ('ರ', 60989), ('व', 59783), ('य', 58753), ('র', 57909), ('public', 57011), ('റ', 53817), ('associates', 53658), ('ர', 52592), ('इ', 52285), ('ब', 51882), ('మ', 50566), ('డ', 50478)]
+  top 60 addr tokens: [('no', 1358063), ('road', 656910), ('delhi', 562438), ('de', 396272), ('maharashtra', 369141), ('floor', 368602), ('nagar', 348410), ('1', 310296), ('a', 299781), ('c', 298033), ('र', 279029), ('rue', 269468), ('pradesh', 251780), ('street', 248995), ('2', 246697), ('city', 242015), ('new', 236498), ('st', 227774), ('rd', 225108), ('r', 224294), ('h', 223659), ('west', 222958), ('b', 219553), ('mumbai', 218734), ('plot', 206612), ('o', 189108), ('la', 188847), ('dr', 182686), ('tx', 182000), ('avenue', 174901), ('3', 154909), ('ल', 153886), ('d', 151095), ('ave', 150451), ('bangalore', 148450), ('uttar', 146193), ('s', 140259), ('ny', 139494), ('karnataka', 137488), ('drive', 136202), ('door', 135967), ('kolkata', 134285), ('nc', 131405), ('near', 128308), ('4', 126727), ('loire', 126221), ('block', 125489), ('tamil', 123116), ('nadu', 123071), ('मह', 121948), ('ष', 121948), ('ट', 121948), ('oh', 115723), ('5', 115227), ('n', 114876), ('bordeaux', 114724), ('g', 113791), ('colony', 113537), ('sector', 111493), ('gujarat', 111482)]
+
+==========================================================================================
+test\test_source3.tsv: 5,082,316 rows  (read 1.3s)
+  unique entity_id: 5,082,316
+  id prefixes: [('S3-', 5082316)]
+  id length min/max: 4/12
+  country: [('India', 2405000), ('US', 1945701), ('France', 731615)]
+  empty name         :         0 ( 0.00%)
+  empty address      :   136,098 ( 2.68%)
+  addr has 'null' tok:    70,650 ( 1.39%)
+  name has 'null' tok:        23 ( 0.00%)
+  name len q[0.01, 0.25, 0.5, 0.75, 0.99]: [6.0, 19.0, 25.0, 32.0, 50.0]
+  addr len q[0.01, 0.25, 0.5, 0.75, 0.99]: [0.0, 35.0, 43.0, 59.0, 117.0]
+  name Devanagari        :   181,068 ( 3.56%)
+  name other Indic       :   139,571 ( 2.75%)
+  name Latin accents     :   416,873 ( 8.20%)
+  name all-UPPER name    :   162,621 ( 3.20%)
+  name digit in name     :   202,470 ( 3.98%)
+  name url/www/.com      :   163,994 ( 3.23%)
+  name junk <<,>>,--,|,*,#:    75,965 ( 1.49%)
+  name brackets ()[]{}   :   441,245 ( 8.68%)
+  name & in name         :   213,127 ( 4.19%)
+  name DBA/aka/t-a       :    53,208 ( 1.05%)
+  addr Devanagari        :   319,073 ( 6.28%)
+  addr other Indic       :   231,410 ( 4.55%)
+  addr 6-digit (PIN)     :    27,313 ( 0.54%)
+  addr 5-digit (ZIP/CP)  :   236,757 ( 4.66%)
+  addr ZIP+4             :     5,422 ( 0.11%)
+  addr 'near'/'opp'      :   205,700 ( 4.05%)
+  addr PO Box            :    31,147 ( 0.61%)
+  addr Unit/Apt/Suite    :   154,986 ( 3.05%)
+  addr all-UPPER addr    :       914 ( 0.02%)
+  addr starts w/ state/abbr:    81,964 ( 1.61%)
+  distinct lower(name): 4,446,091  | names used >1x: 267,346  | max reuse: 387
+  top names: [('cc', 387), ('sc', 358), ('ac', 297), ('pc', 286), ('lc', 245), ('mc', 243), ('bc', 226), ('cs', 220), ('internal medicine', 214), ('dc', 213), ('rc', 209), ('urgent care', 209)]
+  top 60 name tokens: [('limited', 801531), ('private', 734476), ('ltd', 463660), ('ट', 349189), ('llc', 343756), ('inc', 261559), ('pvt', 253604), ('र', 221508), ('&', 213502), ('ल', 197004), ('center', 169723), ('ड', 167426), ('com', 164749), ('म', 162826), ('स', 160410), ('s', 157506), ('services', 156647), ('प', 156098), ('group', 147245), ('sarl', 144483), ('partners', 136462), ('india', 135884), ('co', 132790), ('l', 126161), ('corp', 114793), ('holdings', 111239), ('sas', 102092), ('इव', 100644), ('llp', 100467), ('a', 91734), ('क', 82413), ('and', 77776), ('ட', 77477), ('enterprises', 75210), ('industries', 73825), ('c', 71947), ('care', 70976), ('france', 68978), ('ventures', 66342), ('of', 66322), ('ట', 61340), ('ಟ', 60136), ('public', 57455), ('associates', 55377), ('ज', 55194), ('trading', 54982), ('service', 54432), ('exports', 53549), ('solutions', 52511), ('club', 51351), ('international', 49815), ('d', 49172), ('m', 46058), ('corporation', 45639), ('ট', 44745), ('p', 44668), ('de', 42686), ('eurl', 42295), ('न', 42195), ('overseas', 41895)]
+  top 60 addr tokens: [('no', 1298833), ('road', 570938), ('delhi', 505081), ('de', 413047), ('new', 401004), ('mh', 371450), ('nagar', 322185), ('1', 317016), ('mumbai', 310856), ('floor', 308995), ('c', 296863), ('city', 296173), ('a', 295562), ('rue', 288687), ('र', 279986), ('north', 254911), ('street', 249213), ('2', 244342), ('dl', 231127), ('st', 225361), ('h', 219784), ('rd', 218354), ('r', 217742), ('b', 213543), ('bangalore', 201792), ('la', 196085), ('west', 193505), ('plot', 187733), ('o', 186991), ('avenue', 184710), ('texas', 183189), ('dr', 181192), ('ल', 154230), ('3', 153107), ('ave', 150354), ('drive', 148989), ('d', 147728), ('south', 145942), ('up', 142372), ('york', 141686), ('unit', 141323), ('pune', 140220), ('ka', 139929), ('carolina', 135465), ('loire', 135372), ('door', 131888), ('4', 125576), ('s', 125345), ('tn', 125341), ('मह', 122346), ('ष', 122346), ('ट', 122346), ('hyderabad', 122200), ('bordeaux', 119338), ('ohio', 116365), ('5', 113834), ('n', 110966), ('kolkata', 110417), ('wb', 110107), ('gj', 109973)]

@@ -1,0 +1,17 @@
+exact brute-force name-only recall@20: 0.7980  (hits 391, misses 99)
+miss reasons: {'true cos < 1 and >=K records score higher': 99}
+#pool records sharing the query's exact core name: median=2 p75=6 p90=70
+
+examples (S1 name | true S2 name | true cos | K-th cos | top-3 retrieved):
+  ('Fresh Auto Body LLC', 'Fresh Auto', 0.79, 1.0, [('Fresh  Auto Body', 1.0), ('Fresh Auto Body Llc', 1.0), ('Fresh Auto Body Llc', 1.0)])
+  ('Fresh Auto Body LLC', 'Fresh-Auto', 0.79, 1.0, [('Fresh  Auto Body', 1.0), ('Fresh Auto Body Llc', 1.0), ('Fresh Auto Body Llc', 1.0)])
+  ('Primary Care Health PLLC', 'Primary Care', 0.817, 1.0, [('THE PRIMARY CARE HEALTH', 1.0), ('PRIMARY CARE HEALTH INC', 1.0), ('Primary  Care Health-LLC', 1.0)])
+  ('Seneex Holdings', '5eneex', 0.435, 0.714, [('Leneex Holdings', 0.842), ('Neex Holdings', 0.836), ('Neex Holdings', 0.836)])
+  ('Seneex Holdings', '5ENEEX', 0.435, 0.714, [('Leneex Holdings', 0.842), ('Neex Holdings', 0.836), ('Neex Holdings', 0.836)])
+  ('Dion Holdings Corp', 'DIIN HOLDINGS CORP', 0.612, 0.759, [('Dion  Holdings', 1.0), ('Dion Holdings', 1.0), ('Dion Inc Holdings', 1.0)])
+  ('Crystal Sim LLC', 'Crystal LLC 5im', 0.619, 0.699, [('Llc Crystal Sim', 1.0), ('Crystal Sim South LLC', 0.846), ('Crystal Public', 0.765)])
+  ('Urgent Care Strategic Center', 'ucstrategic.com', 0.378, 0.794, [('Urgent Care Strategic ([Center])', 1.0), ('Urgent Care Strategic Center  Incorporated', 1.0), ('Urgent Care Strategic Center Ltd', 1.0)])
+  ('Reliable Constellation LLC', 'RELIABLE CMONNTESLLNTGON LLC', 0.32, 0.686, [('RELIABLE CONSTELLATION LLC', 1.0), ('Reliable Constellation Valley LLC', 0.892), ('CRAY RELIABLE CONSTELLATION [LTD]', 0.881)])
+  ('Commission on Buildings', 'Commission on Trading', 0.663, 1.0, [('COMMISSION ON  BUILDINGS LLC', 1.0), ('Commission on Buildings Ltd', 1.0), ('Commission ón Buildings', 1.0)])
+  ('Main Street Seafood Partners', 'Main Main Street-Seafood Center', 0.841, 0.907, [('Main Street Seafood Partners LLC', 1.0), ('Main Street Seafood Partners Corp', 1.0), ('Partners Stréet Seafood Main', 1.0)])
+  ('Pediatric Clinic of Tempe LLC', 'Pediatric  Clinic of Tgmtlpe LLC', 0.502, 0.764, [('LLC Pediatric Clinic of Témpe', 1.0), ('Pediatric Dentistry Group of Tempe Clinic LLC', 0.805), ('Pediatric Dentistry Group of  Tempe Clinic', 0.805)])

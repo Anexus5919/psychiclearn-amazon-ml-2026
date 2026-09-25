@@ -1,0 +1,16 @@
+[US] S2 done at 327s
+[US] S3 done at 688s
+
+=== US: recall of true S{2,3} matches within top-K (name / address / union), 2000 queries
+  S2 K= 5: name=0.0669  addr=0.6594  union=0.6847
+  S2 K=10: name=0.1163  addr=0.7228  union=0.7563
+  S2 K=20: name=0.1800  addr=0.7663  union=0.8109
+  S2 K=50: name=0.2980  addr=0.8068  union=0.8647
+  S3 K= 5: name=0.0601  addr=0.5450  union=0.5757
+  S3 K=10: name=0.1048  addr=0.6260  union=0.6674
+  S3 K=20: name=0.1663  addr=0.6891  union=0.7462
+  S3 K=50: name=0.2769  addr=0.7530  union=0.8293
+  S2+S3 name@20 U addr@20 overall pair recall: 0.7774   mean candidates per S1: 79.5
+  naive no-ML baseline (predict if w*name_cos+(1-w)*addr_cos >= t, tuned on these queries): macro F0.5=0.5122 at (w,t)=(np.float64(0.5), np.float64(0.14))
+  oracle F0.5 given these candidates (perfect classifier): 0.8926
+

@@ -1,0 +1,314 @@
+fetched 134,069 records for 30,000 sampled clusters
+
+====================================================================================================
+SAMPLE CLUSTERS
+====================================================================================================
+
+[US] S1-575002263: 'Capital Holding, LLC' | 'OH, 108 2nd Street, Rome'
+    S2 S2-364726358: 'Capital Holding, Llc' | 'STOUT, OH, 108 SECOND ST' [US]
+    S2 S2-581041748: 'capitalholding.com' | '108 2ST ST, PMB 3330, ROME, OH' [US]
+    S2 S2-664479208: 'Capital Holdig, LLC' | '108 2ST ST, PO BOX 4187, ROME, OH' [US]
+    S3 S3-262200601: 'Capital LLC Services' | '108-110 2rd Street, Rome, Ohio' [US]
+
+[US] S1-215676499: 'Professional Mobility Global Inc.' | '7248 Crystal Mist Drive, Tucson, AZ'
+    S2 S2-444776151: 'Professional Mobility (Glóbal)' | 'AZ, TUCSON, 7248 CRYSTAL MIST DR' [US]
+    S2 S2-505100250: 'Professional  Mobility Global' | '7248 CRYSTAL MIST DR, TUCSON, AZ' [US]
+    S3 S3-265818032: 'Professional Mobility Global-Incorporated' | '7248 Crystal Mist Dr, Tucson, Arizona' [US]
+    S3 S3-661892637: 'Professional  Mobility Global' | 'Crystal Mist Dr, Tucson, Arizona' [US]
+    S3 S3-941598269: 'Professional Mobility Global' | '' [US]
+    S3 S3-235997775: 'Professional Mobility Global Incorporated' | '' [US]
+
+[India] S1-542929422: 'Krishna Finance Private Limited' | '7A, Prospect House 29, Raghunath Dadaji Street, Fort, Mumbai, Maharashtra'
+    S2 S2-380915352: 'कृष्ण फाइनेंस प्राइवेट लिमिटेड' | '7A, Maharashtra, FORT, MUMBAI, PROSPECT HOUSE 29, RAGHUNATH DADAJI STREET' [India]
+    S3 S3-178606398: 'Krishna Finance Private Ltd' | '##7A, Prospect House 29, Raghunath Dadaji Street, Fort, Mumbai, MH' [India]
+    S3 S3-764261650: 'Krishna Finance Limited Center' | '##7A, Mumbai, महाराष्ट्र, Fort' [India]
+
+[India] S1-558942164: 'Shree Entertainment Pvt Ltd' | '2/369, Garden Road, Sahaj Enclave, Manappakkam, Chennai, Tamil Nadu'
+    S2 S2-836308393: 'Shree Entertainment-Pvt Ltd' | 'HN 797 2/369, GARDEN ROAD, SAHAJ ENCLAVE, MANAPPAKKAM, CHENNAI, Tamil Nadu' [India]
+    S3 S3-469193644: 'Shree Ltd  Pvt Entertainment' | '2/369, Garden Road, Sahaj Enclave, Manappakkam, Chennai, Porur, தமிழ்நாடு' [India]
+    S3 S3-712494710: 'Sri Shree Entertainment Pvt' | '2/369, Garden Road, Sahaj Enclave, Manappakkam, Chennai, Porur, TN' [India]
+    S3 S3-523773572: 'Shree Entertainment Pvt-Ltd' | '2/369, Chennai, Porur, TN' [India]
+    S3 S3-173417968: 'Shree Éntertainment Pvt Ltd' | '' [India]
+
+[US] S1-650633890: 'Mansfield Devices' | '4 Clement Road, New Fairfield, CT'
+    S2 S2-952588799: 'Mansfield  Devices' | '4- CLEMENT RD, PO BOX 6850, NEW FAIRFIELD CITY, CT' [US]
+    S3 S3-167308233: 'Mansfield-Devices' | '4- Clement Road, New Fairfield, Connecticut' [US]
+    S3 S3-40209968: 'Mansfield  Devices' | '4- Clement Road, New Fairfield, Connecticut' [US]
+    S3 S3-310391177: 'Jaxevo trading as Mansfield Devices' | '4 Clement Road, New Fairfield, CT' [US]
+
+[India] S1-637414755: 'Jagdamba Tech Public Limited' | '44, Tulsi Estate, Near Changodar, Sanand, Ahmedabad, Gujarat'
+    S2 S2-150762631: 'M/s JAGDAMBA TECH LIMITED SERVICES' | '44, TULSI ESTATE, NEAR CHANGODAR, SANAND, Gujarat' [India]
+    S3 S3-549301317: 'Mr Jagdamba Public Limited Services' | 'No. 398 44, Ahmedabad, Sanand, ગુજરાત' [India]
+    S3 S3-94266636: 'Jagdamba Tech Public Limited' | '398 44, Ahmedabad, Sanand, GJ' [India]
+    S3 S3-909571170: 'Jagdamba  Tech Public Limited' | '' [India]
+
+[India] S1-759910008: 'Jain Star Products Private Limited' | 'Survey No. 236, Subhash Road, Navapada, Dombivli (W), Kalyan, Thane, Maharashtra'
+    S2 S2-666636775: 'जैन स्टार प्रोडक्ट्स प्राइवेट लिमिटेड' | 'SURVEY NO. 236, SUBHASH ROAD, NAVAPADA, DOMBIVLI (W), KALYAN, THANE, Maharashtra' [India]
+    S2 S2-797204282: 'जैन स्टार प्रोडक्ट्स प्राइवेट लिमिटेड' | '236, SUBHASH ROAD, NAVAPADA, DOMBIVLI (W), KALYAN, THANE, Maharashtra' [India]
+    S3 S3-984134999: 'Jain Star Products Private (Limited)' | 'Survey No. 236, Subhash Road, Navapada, Dombivli (W), Kalyan, Thane, MH' [India]
+    S3 S3-987680122: 'Jain Star Products Private' | 'No 236, Kalyan, Thane, MH' [India]
+    S3 S3-683578: 'Synveo a/k/a Jain Star Products Private Limited' | 'Survey No. 236, Subhash Road, Navapada, Dombivli (W), Kalyan, Thane, Maharashtra' [India]
+
+[US] S1-804571341: 'Ear Nose & Throat Clinic, Inc' | '405 Etna Street, Ironton, OH'
+    S3 S3-819000150: 'EAR NOSE & THROAT CLINIC, INC' | '404 Etna St, Ironton, Ohio' [US]
+    S3 S3-771201209: 'Ear & Throat Clinic, Inc Center' | '404 Etna St, Ironton, Ohio' [US]
+    S3 S3-338844693: 'EAR NOSE & THROAT CLINIC, INC' | '404 Etna Street, Ironton, Ohio' [US]
+    S3 S3-190906329: 'Ear Nose + Throat' | '404 Etna St, Ironton, Ohio' [US]
+    S3 S3-116277947: 'Ear Nose Throat & Clinic, Inc' | '404 Etna Street, Ironton, Ohio' [US]
+
+[US] S1-184972285: 'Supreme Lifeco, Inc' | '130 Hamilton Street, Albany, NY'
+    S2 S2-219801831: 'Supreme Lifeco, Inc.' | 'HAMILTON SAINT, ALBANY, NY' [US]
+    S3 S3-849155709: 'Supreme Inc Partners' | 'New York, 130 Hamilton Saint, Albany' [US]
+    S3 S3-273673664: 'Supreme Lifeco,' | '' [US]
+    S3 S3-175427247: 'Supreme Lifeco,' | '130 Hamilton Street, Albany, New York' [US]
+    S3 S3-951120943: 'Supreme Lifeco, (Inc.)' | '' [US]
+    S3 S3-337258565: 'Wexbelozeta f/k/a Supreme Lifeco, Inc' | '130 Hamilton Street, Albany, NY' [US]
+
+[India] S1-321458695: 'Ulhashnagar Edge Ltd' | 'Moreshwar Complex Shop-8 Morya Nagari Rd Ulh-4, Ulhashnagar, Thane, Maharashtra'
+    S2 S2-628606719: 'U1hashnagar Ed Ltd' | 'BLOCK A-744 MORESHWAR COMPLEX SHOP-8 MROYA NAGARI RD ULH-4, ULHASHNAGAR, THANE, Maharashtra' [India]
+    S2 S2-549632298: 'ULHASHNAGAR EDGE' | 'BLOCK A-744 MORESHWAR COMPLEX SHOP-8 MORYA NAGARI RD ULH-4, ULHASHNAGAR, Maharashtra' [India]
+    S2 S2-488585632: 'ULHASHNAGAR EDGE LTD.' | 'BLOCK A-744 MORESHWAR COMPLEX SHOP-8 MORYA NAGARI RD ULH-4, ULHASHNAGAR, महाराष्ट्र' [India]
+    S3 S3-587783881: 'Ulhashnagar Edge' | 'Moreshwar Complex Shop-##8 Morya Nagari Rd Ulh-4, Ulhashnagar, Thane, MH' [India]
+    S3 S3-536957064: 'Edge Ulhashnagar Ltd' | 'Moreshwar Complex Shop-##8 Morya Nagari Rd Ulh-4, Ulhashnagar, Thane, MH' [India]
+    S3 S3-707358786: 'Ulhashnagar Edge Ltd' | 'Moreshwar Complex Shop-##8 Morya Nagari Rd Ulh-4, Thane, Ulhashnagar, MH' [India]
+
+[US] S1-234507012: 'Esparza Ridge Sunrise Inc' | '9 Falling Leaf Lane, Houston, TX'
+    S2 S2-237746314: 'Esparza Ridge Sunrise Ínc' | '9 FALLING LEAF LN, HOUSTON, TX' [US]
+    S3 S3-37347242: 'Esparza Ridge Sunrise Inc' | '#9 Falling Leaf Lane, Houston, Texas' [US]
+    S3 S3-245282637: 'Esparza Ridge Sunrise  Inc' | '#9 Falling Leaf Lane, Houston, Texas' [US]
+    S3 S3-786913092: 'Esparza Ridge Sunrise  Inc' | 'Texas, Houston, #9 Falling Leaf Lane' [US]
+    S3 S3-123174003: 'Esparza Rídge Sunrise Inc' | '#9 Falling Leaf Ln, Houston, Texas' [US]
+
+[India] S1-557378892: 'City Producer Private Limited' | 'Junagadh Suzuki, Sub Plot No. 1-B, Plot No. 2, Opp: Sakar Baug, Rajkot-Junagadh Highway, Junagadh, Gujarat'
+    S2 S2-319952553: 'સિટી પ્રોડ્યુસર પ્રાઇવેટ લિમિટેડ' | 'JUNAGADH SUZUKI, SUB PLOT NO. 1-B, PLOT NO. 2, OPP: SAKAR BAUG, RAJKOT-JUNAGADH HIGHWAY, JUNAGADH, Gujarat' [India]
+    S2 S2-932592846: 'Private City Porderu Limited' | 'JUNAGADH SUZUKI, SUB PLOT NO. 1-B, PLOT NO. 2, OPP: SAKAR BAUG, JUNAGADH, RAJKOT-JUNAGADH HIGHWAY, Gujarat' [India]
+    S2 S2-380945938: 'City Producer Private-Limited' | 'JUNAGADH SUZUKI, SUB PLOT NO. 1-B, PLOT NO. 2, OPP: SAKAR BAUG, RAJKOT-JUNAGADH HIGHWAY, Gujarat' [India]
+    S2 S2-47454935: 'City Producer Private Ltd' | 'JUNAGADH SUZUKI, SUB PLOT NO. 1-B, PLOT NO. 2, OPP: SAKAR BAUG, RAJKOT-JUNAGADH HIGHWAY, Gujarat' [India]
+    S3 S3-265415029: 'City Producer' | 'GJ, Junagadh Suzuki, Sub Plot No. 1-B, Plot No. 2, Opp: Sakar Baug, Junagadh' [India]
+    S3 S3-29055525: 'City  Producer-Private Limited' | 'Junagadh Suzuki, Rajkot-junagadh Highway, Junagadh, GJ' [India]
+
+[US] S1-216457049: 'Wildlife Committee' | 'OH, 22612 Lenox Drive, Fairview Park'
+    S2 S2-898235227: 'wildlife committee' | '22612 LENOX DR, CLEVELAND, OH' [US]
+    S2 S2-844653611: '#wildlifecommittee' | '22612 Lenox Dr, FAIRVIEW PARK, OH' [US]
+    S2 S2-712216401: 'Wildlife (Cotmmite)' | '22612 LENOX DRIVE, FAIRVIEW PARK, OH' [US]
+    S3 S3-630803025: 'Wildlife Committee' | '22612 Lenox Drive, PMB 5446, Fairview Park, Ohio' [US]
+    S3 S3-256269036: 'Wildlife [Committee]' | '22612 Lenox Drive, PMB 5446, Cleveland, Ohio' [US]
+
+[India] S1-382551947: 'Balaji Projects Private Limited' | 'U.G 18, Mangalam Tower, Electronic Market Near Riddhi Siddhi, Mansarovar, Jaipur, Rajasthan'
+    S2 S2-167646030: 'बालाजी प्रोजेक्ट्स प्राइवेट लिमिटेड' | 'PLOT 310 U.G 18, MANGALAM TOWER, ELECTRONIC MARKET NEAR RIDDHI SIDDHI, MANSAROVAR, JAIPUR, Rajasthan' [India]
+    S2 S2-263835901: 'Shri Balaji Projects Private' | 'PLOT 310 U.G 18, MANGALAM TOWER, ELECTRONIC MARKET NEAR RIDDHI SIDDHI, MANSAROVAR, JAIPUR, Rajasthan' [India]
+    S2 S2-929843634: 'BALAJI PROJECTS PRIVATE  LIMITED' | '' [India]
+    S3 S3-259268603: 'Balaji Projects Private [Limited]' | 'U.g 18, राजस्थान, Jaipur, Mangalam Tower, Electronic Market Near Riddhi Siddhi, Mansarovar' [India]
+    S3 S3-930944355: '... Balaji  Projects Private Ltd' | 'U.g 18, Mangalam Tower, Electronic Market Near Riddhi Siddhi, Mansarovar, Jaipur, RJ' [India]
+    S3 S3-713052268: 'Balaji Private Limited Partners' | 'U.g 18, Mangalam Tower, Electronic Market Near Riddhi Siddhi, Mansarovar, Jaipur, RJ' [India]
+
+[India] S1-486451827: 'Dss Care LLP' | 'House No 16, Ishanagar (East) Po/Ps- Phulwarisharif, Patna, Bihar'
+    S2 S2-434305519: 'Service Dss LLP' | 'HOUSE NO 16, PATNA, ISHANAGAR (EAST) PO/PS- PHULWARISHARIF, बिहार' [India]
+    S2 S2-363922585: 'Dss Care  LLP' | 'HOUSE NO 16, ISHANAGAR (EAST) PO/PS- PHUWLARISHARIF, Bihar' [India]
+    S2 S2-603444929: 'Mr DSS CARE LLP' | 'HOUSE NO 16, ISHANAGAR (EAST) PO/PS- PHULWARISHARIF, Bihar' [India]
+    S3 S3-551141131: '>> Dss Care L.L.P.' | '#845 House No 16, Ishanagar (East) Po/ps- Phulwarisharif, Patna, BR' [India]
+    S3 S3-36824703: 'Dss-Care LLP' | '845 Holse No 16, Ishanagar (East) Po/ps- Phulwarisharif, Patna, बिहार' [India]
+    S3 S3-91491298: 'Shri Dss Care L.L.P.' | 'No 845 Hose No 16, Ishanagar (East) Po/ps- Phulwarisharif, Patna, BR' [India]
+    S3 S3-651278227: 'DSS CARE LLP' | 'H.no 845 House No 16, Patna, Ishanagar (East) Po/ps- Phulwarisharif, BR' [India]
+    S3 S3-889369557: 'Dss Care' | '#845 Hosue No 16, Ishanagar (East) Po/ps- Phulwarisharif, Patna, BR' [India]
+
+[India] S1-736195749: 'Bpl Technologies LLP' | 'South Delhi, Delhi, 61, New Delhi, Basant Lok, Vasant Vihar'
+    S3 S3-34635199: 'Bpl LLP Technologies' | 'No 77 61, Basant Lok, Vasant Vihar, New Delhi, South Delhi, DL' [India]
+    S3 S3-447999942: 'Bpl Technologies Llp' | 'दिल्ली, Basant Lok, Vasant Vihar, New Delhi, H.no 77 61, South Delhi' [India]
+    S3 S3-172789451: 'L.L.P. Bpl Technologies' | 'H.no 77 61, New Delhi, South Delhi, DL' [India]
+
+[US] S1-151079199: 'D & J Scientific' | '7137 Rancho Vista Drive, Unit STE B09, Scottsdale, AZ'
+    S3 S3-230354592: 'The D  and J Scientific' | '' [US]
+    S3 S3-499641173: 'D & J Scientific  LP' | '7137 Rancho Vista Dr, # STE B09, Scottsdale, Arizona' [US]
+
+[India] S1-819116888: 'Mahalakshmi Enterprises Private Limited' | 'Shop No. 04, Sai Niwas, Survey No. 117, Midc G Bl, Pune City, Pune, Maharashtra'
+    S2 S2-65520105: 'Mahalakshmi Enterprises' | 'NO 04 , SAI NIWAS, SURVLY NO. 117, MIDC G BL, PUNE CITY, Maharashtra' [India]
+    S2 S2-29814890: 'MAHALAKSHMI ENTERPRISES PDRVIMTSE (LIMITED)' | '04 , SAI NIWAS, SURVEY NO. 117, MIDC G BL, PUNE CITY, महाराष्ट्र' [India]
+    S2 S2-343561819: 'Psravge Mahalakshmi Enterprises Limited' | 'SAI NIWAS, SURVEY NO. 117, MIDC G BL, Maharashtra, H.NO 04, PUNE, PUNE CITY' [India]
+    S3 S3-220683376: 'Nexavi' | '#04, Sai Niwas, Survey No. 117, Midc G Bl, Pune City, Pune, MH' [India]
+    S3 S3-363391775: 'Sri Mahalakshmi Private Limited Sérvice' | 'Shap No. 04, Pune City, Pune, महाराष्ट्र' [India]
+    S3 S3-53194778: 'Mahalakshmi  Enterprises Private Limited' | 'Shp No. 04, Sai Niwas, Survey No. 117, Midc G Bl, Pune City, Pune, MH' [India]
+
+[US] S1-681825304: 'Foot & Ankle Cornerstone Clinic Inc' | '699 Bacon Road, Littleton, NC'
+    S2 S2-316606388: 'Foot & Ankle Cornerstone' | 'LITTLETON, NC, 699 BACON RD' [US]
+    S2 S2-170230513: 'foot & ankle cornerstone clinic inc' | '699 BACON RD, NC, LITTLETON' [US]
+    S2 S2-166291790: 'Foot & Ankle Cornerstone Clinic' | '699 BACON RD, LITTLETON, NC' [US]
+    S3 S3-641884891: 'Foot & Ankle Cornerstone Clinic' | '699 Bacon Road, Littleton, North Carolina' [US]
+    S3 S3-224974247: 'Foot + Ankle Cornerstone Inc Services' | '699 Bacon Road, Littleton, North Carolina' [US]
+
+[India] S1-888495817: 'Apex Consulting' | 'West Bengal, 64/9 Beliaghata Main Road, Calcutta, Kolkata'
+    S2 S2-140401962: 'অ্যাপেক্স কনসাল্টিং' | 'DOOR NO 64/9 BELIAGHATA MAIN ROAD, KOLKATA, CALCUTTA, West Bengal' [India]
+    S3 S3-813198109: 'অ্যাপেক্স কনসাল্টিং' | 'C-64/9 Beliaghata Main Road, Calcutta, Kolkata, WB' [India]
+
+[US] S1-689254896: 'Family Patriot Center Care' | '1856 Ferguson Street, Rotterdam, NY'
+    S2 S2-174695788: 'Family Patriot Center Care Corp' | '1856 FERGUSON STREET, SCHENECTADY, NY' [US]
+
+[India] S1-718749059: 'Sree Prime It Private Limited' | 'Flat No. A-105, Hari Marg, Civil Lines, Jaipur, Rajasthan'
+    S2 S2-558592841: 'श्री प्राइम आईटी प्राइवेट लिमिटेड' | 'HARI MARG, CIVIL LINES, JAIPUR, FLAT NO. A-105, Rajasthan, JAIPUR' [India]
+    S2 S2-278017722: 'श्री प्राइम आईटी प्राइवेट लिमिटेड' | 'FLAT NO. A-105, HARI MARG, CIVIL LINES, JAIPUR, Rajasthan' [India]
+    S2 S2-398988105: 'श्री प्राइम आईटी प्राइवेट लिमिटेड' | 'FLAT NO. A-105, JAIPUR, राजस्थान' [India]
+    S3 S3-548309274: '>> Sree Prime Private Limited Center' | 'Flat No. A-105, Jaipur, RJ' [India]
+    S3 S3-215671301: 'Sree Prime It Private Ltd' | 'Flat No. A-105, Hari Marg, Civil Lines, Jaipur, RJ' [India]
+
+[India] S1-696260865: 'Maxwealth Vinayak Limited' | '2A/1202, Rustomjee Regency, Ideal Farm, J.S. Road, Dahisar West, Mumbai, Mumbai City, Maharashtra'
+    (singleton)
+
+[US] S1-150831272: 'Internal Medicine Grand Clinic Inc' | '3631 J Road, Beloit, KS'
+    S2 S2-167242257: 'Internal Medicine Grand' | '#3631 J ROAD, BELOIT, KS' [US]
+    S2 S2-822583723: 'Internal Medicine Grand Clinic  Inc' | '#3631 J ROAD, BELOIT, KS' [US]
+    S2 S2-692920083: 'Internal Medicine Grand' | '#3631 J ROAD, BELOIT, KS' [US]
+    S3 S3-175898324: 'Internal Medicine Grand  Clinic Inc' | '3631 J Rd, Beloit, Kansas' [US]
+    S3 S3-47562530: 'Ectolyra formerly Internal Medicine Grand Clinic Inc' | 'KS, 3631 J Road, Beloit' [US]
+
+[India] S1-123317281: 'Blue Developers Limited' | '123/3, Rajrooppur, Thana Dhoomanganj, Janpad, Prayagraj, Allahabad, Uttar Pradesh'
+    S2 S2-645323325: 'ब्लू डेवलपर्स लिमिटेड' | '123/3, RAJROOPPUR, THANA DHOOMANGANJ, JANPAD, PRAYAGRAJ, ALLAHABAD, Uttar Pradesh' [India]
+    S2 S2-393363196: 'Blue (Developers)' | '123/3, RAJROOPPUR, THANA DHOOMANGANJ, JANPAD, PRAYAGRAJ, Uttar Pradesh' [India]
+    S3 S3-839897657: 'Blue Developers लिमिटेड' | 'D/123/3, Rajrooppur, Thana Dhoomanganj, Janpad, Prayagraj, Allahabad, UP' [India]
+    S3 S3-817410112: 'Blue Developers  Ltd' | 'D/123/3, Rajrooppur, Thana Dhoomanganj, Janpad, Prayagraj, Allahabad, UP' [India]
+    S3 S3-53514233: 'ब्लू डेवलपर्स लिमिटेड' | 'D/123/3, Allahabad, Prayagraj, UP' [India]
+
+[US] S1-867311907: "Bachmann's Bistro" | '25560 Springview Drive, Plainfield, IL'
+    S2 S2-721055329: "Bachmann's Bistro Ltd" | '25560  SPRINGVIEW DRIVE, PLAINFIELD, IL' [US]
+    S2 S2-558332429: '@bachmannsbistro' | '25560  SPRINGVIEW DR, IL, INCORPORATED' [US]
+    S3 S3-47729340: "Báchmann'S-Bistro" | '25560 Springview Drive, Plainfield, Illinois' [US]
+    S3 S3-14708943: "Bachmann'S-Bsro" | '25560 Springview Dr, Plainfield, Illinois' [US]
+
+[US] S1-211969384: 'Blessing, Roberson & Pearl Corp' | 'City Of Kiel, WI, 1130 River Rock Court'
+    S2 S2-253654078: 'BLESSING, ROHRSN & PEARL CORP' | '1130 RIVER ROCK COURT, NULL, KIEL, WI' [US]
+    S3 S3-743410341: 'Blessing, Roberson & Pearl (Corp)' | 'River Rock Ct, City Of Kiel, Wisconsin' [US]
+    S3 S3-635960941: 'The Blessing, Roberson & Pearl Corp' | '1130 River Rock Court, City Of Kiel, Wisconsin' [US]
+
+[India] S1-857436847: 'New Jain Management' | '1993, Takia Yakin Shah Ki Kothi Ghat Gate, Jaipur, Rajasthan'
+    S3 S3-68831948: 'New Jain Service' | '#A-987 1993, Takia Yakin Shah Ki Kothi Ghat Gate, Jaipur, RJ' [India]
+    S3 S3-713348702: 'Quozeph a/k/a New Jain Management' | '1993, Takia Yakin Shah Ki Kothi Ghat Gate, Jaipur, Rajasthan' [India]
+
+[India] S1-634703905: 'Kanva Services Pvt. Ltd.' | '226, Floor-2 Plot-144, Majestic Shopping Centre, Jagannath Shankarsheth Marg, Ambewadi, G, Irgaon, Mumbai, Mumbai City, Maharashtra'
+    S2 S2-881496882: 'Kanva Seeovces Pvt. Ltd.' | '226, FLOOR-2 PLOT-144, MAJESTIC SHOPPING CENTRE, JAGANNATH SHANKARSHETH MARG, AMBEWADI, G, IRGAON, MUMBAI, Maharashtra' [India]
+    S2 S2-579938955: 'KANVA SEHVCCIES PVT LTD' | '226, FLOOR-2 PLOT-144, MAJESTIC SHOPPING CENTRE, JAGANNATH SHANKARSHETH MARG, AMBEWADI, G, IRGAON, MUMBAI, महाराष्ट्र' [India]
+    S2 S2-602323502: 'M/s Kanva Services Pvt.' | '226, FLOOR-2 PLOT-144, MAJESTIC SHOPPING CENTRE, JAGANNATH SHANKARSHETH MARG, AMBEWADI, G, IRGAON, MUMBAI, Maharashtra' [India]
+    S3 S3-23693271: 'Kanva Sertvices Pvt. Ltd.' | 'G-226, Floor-2 Plot-144, Majestic Shopping Centre, Jagannath Shankarsheth Marg, Ambewadi, G, Irgaon, Mumbai City, Mumbai, MH' [India]
+    S3 S3-2483422: 'Kanva-Services Pvt. Ltd' | 'G-226, Mumbai, Mumbai City, महाराष्ट्र' [India]
+
+[US] S1-670064584: 'Kacy Smith Martin' | '2398 Delaware Turnpike, New Scotland, NY'
+    S2 S2-568435417: 'Kacy  Smith Martin' | 'NEW SCOTLAND, NY, 2398 Delaware Tpke, null' [US]
+    S3 S3-842592681: 'kacysmithmartin.com' | '2398 Delaware Tpke, N/A, New Scotland, New York' [US]
+
+[US] S1-695764896: 'PSG Electric LLC' | '2210 Eisenhower Avenue, Port Orchard, WA'
+    S2 S2-942710326: 'PSG ELECTRIC' | '2210-2214 EISENHOWER AVENUE, PORT ORCHARD, WA' [US]
+    S2 S2-780058477: 'PSG ELECTRIC L.L.C.' | '2210-2214 EISENHOWER AVE, PORT ORCHARD, WA' [US]
+    S3 S3-480643731: 'psgelectric.com' | 'Eisenhower Avenue, Port Orchard, Washington' [US]
+    S3 S3-673029309: 'PSG Electric' | '2210 Eisenhoewr Ave, Port Orchard, Washington' [US]
+
+[India] S1-921285645: 'MD Infotech Private Limited' | 'Suratwala Mark Plaza, Office No. 204, S.No. 28/1(4, 5, 6), Hinjewadi, Pune City, Pune, Maharashtra'
+    S2 S2-756462928: 'MD INFOTECH  PRIVDGTE LIMITED' | 'SURATWALA MARK PLAZA, OFFICE NO. 204, S.NO. 28/1(4, 5, 6), HINJEWADI, PUNE CITY, Maharashtra' [India]
+    S3 S3-162690813: 'MD Infotech Private Ltd' | 'Suratwala Mark Plaza, N/A, Pune City, Pune, MH' [India]
+    S3 S3-726905167: 'Infotech -- MD Private' | 'Suratwala Mark Plaza, N/A, Pune City, Pune, MH' [India]
+    S3 S3-59656201: 'MD Infotech Prviae Limited' | 'N/A, Pune City, Suratwala Mark Plaza, Pune, MH' [India]
+
+[US] S1-879448968: 'Namoque Bhav L.L.C.' | '8644 Ashley Glen Circle, Memphis, TN'
+    S2 S2-576384422: 'NAMOQUE BHAV L.L.C.' | '008644 ASHLEY GLEN CIRCLE, CORDOVA, TN' [US]
+    S2 S2-807974242: 'Namoque Bfhnav L.L.C.' | '008644 ASHLEY GLEN CIRCLE, CORDOVA, TN' [US]
+    S3 S3-151066278: 'namoquebhav.com' | '8644 Ashley Glen Cir, Memphis, Tennessee' [US]
+
+[US] S1-692709175: 'Huber Snow' | '12423 Partridge Run Drive, Florissant, MO'
+    (singleton)
+
+[India] S1-842001698: 'Saraswati (India) Autotech Private Limited' | '39/2, Suky, 1Stfloor, 5Thmain, Malleshpalya, Newthippasandra, Bangalore, Karnataka'
+    (singleton)
+
+[US] S1-282939451: 'Empire Peak Apogee LLC' | '3107 Tournament Drive, Chesapeake City, VA'
+    (singleton)
+
+[US] S1-872413792: 'Holmes & Shaikh LLC' | '570 57th Avenue, Fridley, MN'
+    (singleton)
+
+[India] S1-558081595: 'Services Logistics Stores LLP' | 'Flat 2 A, Door No. 7 & 8, Balamurugan Nagar 3Rd Street, Tancy Nagar, Velachery, Chennai, Tamil Nadu'
+    (singleton)
+
+[US] S1-399247767: 'Elspeth Oliveira Kkr' | '5810 Morgantown Lane, Spokane, WA'
+    (singleton)
+
+[US] S1-71060285: 'Voigt Quality Vaneck LLC' | '10810 Slumbering Falls Lane, Cypress, TX'
+    (singleton)
+
+[US] S1-776136992: 'Gaque LLC' | '8405 Kansas Road, Sedgwick, KS'
+    (singleton)
+
+[India] S1-123067787: 'Smart Technologies Private Limited' | 'Nm 31/85, Nathi Bai Chawl, Tambe Ngr Lower Depot Pada, Vikhroli Parksite, Mumbai, Mumbai City, Maharashtra'
+    (singleton)
+
+[India] S1-484920797: 'Stanch Enterprises' | 'No. 310, 3Rd Floor, Harihar Enclave, R.P.S. Road, Near Ashtha Honda Service Centre, Danapur, Patna, Bihar'
+    (singleton)
+
+[India] S1-532977055: 'Rooptech Ifsc LLP' | 'Flat No 816, Lansum Greens, Madhavadhara, Vishakapatnam, Visakhapatnam (Urban), Visakhapatnam, Vishakhapatnam, Andhra Pradesh'
+    (singleton)
+
+--- MATCHED pairs: n=104,069
+  India  S2  n=20,251 | exact_lower=0.061 norm_eq=0.447 share_core_tok=0.707 name_devanagari=0.139 other_indic=0.099 addr_empty=0.038
+         name token_set_ratio p10/25/50/75/90 = [11.0, 44.0, 93.0, 100.0, 100.0]   token_sort = [10.0, 41.0, 85.0, 96.0, 100.0]
+         addr token_set_ratio p10/25/50/75/90 = [86.0, 93.0, 100.0, 100.0, 100.0]   share_number(|both have nums)=0.967
+  India  S3  n=21,896 | exact_lower=0.065 norm_eq=0.467 share_core_tok=0.802 name_devanagari=0.073 other_indic=0.056 addr_empty=0.041
+         name token_set_ratio p10/25/50/75/90 = [13.0, 82.0, 97.0, 100.0, 100.0]   token_sort = [12.0, 66.0, 87.0, 100.0, 100.0]
+         addr token_set_ratio p10/25/50/75/90 = [74.0, 88.0, 94.0, 97.0, 100.0]   share_number(|both have nums)=0.960
+  US     S2  n=29,992 | exact_lower=0.140 norm_eq=0.586 share_core_tok=0.915 name_devanagari=0.000 other_indic=0.000 addr_empty=0.051
+         name token_set_ratio p10/25/50/75/90 = [78.0, 93.0, 100.0, 100.0, 100.0]   token_sort = [67.0, 82.0, 92.0, 100.0, 100.0]
+         addr token_set_ratio p10/25/50/75/90 = [76.0, 89.0, 95.0, 100.0, 100.0]   share_number(|both have nums)=0.874
+  US     S3  n=31,930 | exact_lower=0.128 norm_eq=0.551 share_core_tok=0.918 name_devanagari=0.000 other_indic=0.000 addr_empty=0.044
+         name token_set_ratio p10/25/50/75/90 = [79.0, 93.0, 100.0, 100.0, 100.0]   token_sort = [63.0, 78.0, 91.0, 100.0, 100.0]
+         addr token_set_ratio p10/25/50/75/90 = [70.0, 81.0, 88.0, 94.0, 96.0]   share_number(|both have nums)=0.900
+
+--- RANDOM same-country/same-source pairs: n=104,069
+  India  S2  n=20,251 | exact_lower=0.000 norm_eq=0.000 share_core_tok=0.012 name_devanagari=0.140 other_indic=0.102 addr_empty=0.036
+         name token_set_ratio p10/25/50/75/90 = [11.0, 20.0, 33.0, 45.0, 59.0]   token_sort = [10.0, 20.0, 33.0, 42.0, 53.0]
+         addr token_set_ratio p10/25/50/75/90 = [31.0, 35.0, 38.0, 42.0, 46.0]   share_number(|both have nums)=0.087
+  India  S3  n=21,896 | exact_lower=0.000 norm_eq=0.000 share_core_tok=0.013 name_devanagari=0.075 other_indic=0.055 addr_empty=0.040
+         name token_set_ratio p10/25/50/75/90 = [13.0, 27.0, 35.0, 48.0, 64.0]   token_sort = [13.0, 26.0, 34.0, 44.0, 55.0]
+         addr token_set_ratio p10/25/50/75/90 = [26.0, 32.0, 37.0, 41.0, 44.0]   share_number(|both have nums)=0.083
+  US     S2  n=29,992 | exact_lower=0.000 norm_eq=0.000 share_core_tok=0.012 name_devanagari=0.000 other_indic=0.000 addr_empty=0.052
+         name token_set_ratio p10/25/50/75/90 = [23.0, 27.0, 32.0, 38.0, 43.0]   token_sort = [23.0, 27.0, 32.0, 37.0, 41.0]
+         addr token_set_ratio p10/25/50/75/90 = [27.0, 31.0, 35.0, 39.0, 44.0]   share_number(|both have nums)=0.002
+  US     S3  n=31,930 | exact_lower=0.000 norm_eq=0.000 share_core_tok=0.012 name_devanagari=0.000 other_indic=0.000 addr_empty=0.045
+         name token_set_ratio p10/25/50/75/90 = [22.0, 27.0, 32.0, 38.0, 43.0]   token_sort = [22.0, 27.0, 32.0, 37.0, 41.0]
+         addr token_set_ratio p10/25/50/75/90 = [28.0, 32.0, 35.0, 39.0, 43.0]   share_number(|both have nums)=0.003
+
+matched pairs with no shared core name token (Latin script both sides): 8,295 / 104,069
+  'Hari Trading Private Limited'                <-> 'haritrading.com'                             | 'Flat No. A, Thomas Layout, 1St Floor Sarjapur Main' <-> 'FLAT NO. A, THOMAS LAYOUT, 3-1ST FLOOR SARJAPUR MA'
+  "Perla's Seafood LLC"                         <-> 'PERLASSEAFOOD.COM'                           | '14231 Sycamore Road, Ottumwa, IA' <-> '14231 SYCAMORE RD, OTTUMMWA, IA'
+  'Mccoy and Bryan'                             <-> 'Brixcalo'                                    | '3280 High View Drive, Louisville, TN' <-> '328 High View Drive, Louisville, Tennessee'
+  'Krishna Builders Pvt Ltd'                    <-> 'BUILDERSKRISHNA.COM'                         | 'The Maa Bhagwati Co-Op Group Housi Plot No. 16, Se' <-> 'THE MAA BHAGWATI CO-OP GROUP HOUSI PLOT NO. 016, S'
+  'Mandara & Co Company'                        <-> 'Shri Yumacira'                               | 'Pt. Kamraj Market, Rajaram Ki Bagiya Rajpur Chungi' <-> 'UP, Agra, Hn 6-63 Pt. Kamraj Market, Rajaram Ki Ba'
+  'Nilkanth & Co'                               <-> 'Umbralyralyra'                               | '180, Rajeev Gandhi Ward Lal Bahadur Shastri Nagar,' <-> '180, Jabalpur, Baghraji, MP'
+  'Lower Preparatory Academy Inc.'              <-> 'preparatoryloweracademy.com'                 | '3600 Happy Valley Road, Unit 1215, Phoenix, AZ' <-> '3600 HAPPY VALLEY RD, PHOENIX, AZ'
+  'Pediatric Dentistry Health'                  <-> '#pediatricdentistry'                         | '16 Doe Run Lane, Centralia, IL' <-> '0016 Doe Run Lane, Centarlia, Illinois'
+  'Peralta Cardiology'                          <-> 'Néxzephnex'                                  | '2400 Pole Line Road, Decorah, IA' <-> '2400 Pole Line Road, Decorha, Iowa'
+  'Dee Rush, D.D.S.'                            <-> 'PYRALYRA'                                    | '3500 Holly Street, Alexandria City, VA' <-> 'Holly Street, ALEXANDRIA CITY, VA'
+  'Monarch LLC'                                 <-> 'Fayeciradova'                                | '3488 85, Westerlo, NY' <-> '488 85, Westerlo, New York'
+  'Dinesh & Co'                                 <-> 'Dicnsch & Co'                                | 'Kolkata, Calcutta, 4 Raja Woodmount Street, West B' <-> '4 RAJA WOODMOUNT STREET, KOLKATA, CALCUTTA, West B'
+  'Viral Advertising'                           <-> 'Smt viraladvertising.com'                    | 'Thane, Bldg El-Canto/1403, Thane, Maharashtra, Nr ' <-> 'Bldg El-canto/1403, Thane, MH, Waghbil'
+  'Winonah Thomas, D.D.S., P.C.'                <-> 'Veragildvera'                                | '343 Idlebrook Court, Dubuque, IA' <-> '343A Idlebrook Ct, Dubuquue, Iowa'
+  'Historical Diamond Federation, LLC'          <-> '#historicaldiamond'                          | '4713 Kelly Circle, City Of Holladay, UT' <-> '4713 KELLY CIRCLE, CITY OF HOLLADAY, UT'
+  'IOE Horizon Eco'                             <-> '@ioehorizon'                                 | '1740 Latham Avenue, Lima, OH' <-> '1740 LATHAM AVE, OH, LMIA'
+  'Cascade College'                             <-> 'Ariaaria'                                    | '12718 Tennis Drive, Houston, TX' <-> '12718 TENNIS DRIVE, HOUSTON, TX'
+  'Jst (India) Services Private Limited'        <-> 'Noviquotavo'                                 | 'Maharashtra, Kolhapur, Hatkanangle, H No.12/2, Sch' <-> 'S.No-7348, H No.12/2, School Near Janata Chowk, Ha'
+  'Srijan (India) Park Pvt Ltd'                 <-> 'M/s srijanindiapark.com'                     | 'House No.68 East Portion, L/G/F Street No. 4 Blk-M' <-> 'HN 29- HOUSE NO.68 EAST PORTION, L/G/F STREET NO. '
+  'Abhilasha Sangh'                             <-> '#abhilashasangh'                             | 'Mechirakath House Edat P O, Kunhimangalam, Payyann' <-> 'Mechirakath House Edat P O, Payyannur, Kannur, KL'
+  'Valley Preparatory Academy LLC'              <-> '@valleypreparatory'                          | '5603 Silktree Trail, Jeffersonville, IN' <-> 'SILKTREE TRL, NULL, JEFFERSONVILLE, IN'
+  'Memphis Chiropractic Partners LLC'           <-> '@memphischiropractic'                        | '4071 Grey Road, Memphis, TN' <-> '4071 Gery Rd, Memphis, Tennessee'
+  'GT Precision Scientific'                     <-> 'gtprecisionscientific.com'                   | '2411 Washington Ln, Davenport, IA' <-> '241 WASHINGTON LN, DAVENPORT, IA'
+  'Gallagher Crystal John LLC'                  <-> 'GCJ'                                         | '5907 Annex Court, Fl 0, Saint Louis, MO' <-> 'Fl 0, 5907 Annex Court, Saint Louis, MO'
+  'Klr & Co'                                    <-> 'Novihalo'                                    | 'Delhi, North West Delhi, Phase I, Ashok Vihar, E-1' <-> 'E-141, Phase I, Ashok Vihar, Delhi, North West Del'
+  'Cooney Egh'                                  <-> 'Arczeta'                                     | '1814 E 38th Street Ct, Unit APT 5A, Davenport, IA' <-> '1814 E 38th Street Ct, Unit APT 5A, Davenport, Iow'
+  'Butecva LLC'                                 <-> 'Bueticiad LLC'                               | 'WA, Spokane, 4231 8th Avenue' <-> '4231 EGIHTH AVE, N/A, SPOKANE, WA'
+  'Mason and Neve Corp'                         <-> 'Fayeariaxylo'                                | '408 4th Street, Austin, MN' <-> 'FOURTH STREET, AUSTIN, MN'
+  'Coastal Best Republic'                       <-> 'coastalbestrepublic.com'                     | '15252 Seneca Road, Unit UNIT 96, Victorville, CA' <-> '15252 Seneca Rd, Unit UNIT 96, Victorville, Califo'
+  'Global Mustang LLC'                          <-> 'Gmustang.Com'                                | '3500 Roanoke Street, Broken Arrow, OK' <-> '3500 Roanoke St, Broken Arrow, Oklahoma'
+  "Gertrud's Advertising"                       <-> '@gertrudsadvertising'                        | '50 Beverly Hills Circle, Unit 7, Crossville, TN' <-> '#50 BEVERLY HILLS CIR, CROSSVILLE, TN'
+  'Emm College Private Limited'                 <-> 'EC'                                          | 'H.No.2-82, Bendalapadu, Gurram Gudem Panchayathi C' <-> 'H.No.2-82, Bendalapadu, Gurram Gudem Panchayathi C'
+  'Gonzalez Complete Muniholdings LLC'          <-> '#gonzalezcomplete'                           | '14426 35th Drive, Phoenix, AZ' <-> '14426 35TH DR, PHOENIX, AZ'
+  'Gkb Nutri Private Limited'                   <-> 'gkbnutri.com'                                | 'No.30, Ground Floor, Madhanagar Main Road, Sriperu' <-> 'H.NO 30 , GROUND FLOOR, MADHANAGAR MAIN ROAD, SRIP'
+  'Rachel & Brothers Ltd'                       <-> 'RACHELBROTHERS.COM'                          | 'Houseno33, Ramanand Nagar, Gufa Mandir, Lal Ghati,' <-> 'HOUSSNO33, RAMANAND NAGAR, GUFA MANDIR, LAL GHATI,'
+  'T 6 P Sunrise'                               <-> 't6p.com'                                     | '209 Sequoia Drive, Forney, TX' <-> 'FORNEY, 209 SEQUOIA DRIVE, TX'
+  'Urology Partners LLC'                        <-> 'UrologypartnersCom'                          | '1916 Runnymede Road, Winston-salem, NC' <-> '1916 Runnymede Road, Winston-Salem, North Carolina'
+  'Pharmaceuticals LLC'                         <-> 'LLC Pmrmaceticabs'                           | '2012 Elder Way, Round Rock, TX' <-> '2012 ELDER WAY, ROUND ROCK, TX'
+  'Bhopal Strategy Company'                     <-> 'bstrategy.com'                               | 'Flat No. G-4, Bhagwan Enclave Phase Ii Gurunanakpu' <-> 'NO. 384- FLAT NO. G-4, BHAGWAN ENCLAVE PHASE II GU'
+  'Capital National Ramaco'                     <-> 'capitalnationalramaco.com'                   | '1025 Brightwood Court, Clarksville, TN' <-> '1025 Brightwood Court, Clarksville, Tennessee'

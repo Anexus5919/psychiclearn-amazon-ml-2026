@@ -1,0 +1,32 @@
+[US] S2 done at 299s
+[US] S3 done at 546s
+
+=== US: recall of true S{2,3} matches within top-K (name / address / union), 2000 queries
+  S2 K= 5: name=0.0669  addr=0.6594  union=0.6847
+  S2 K=10: name=0.1163  addr=0.7228  union=0.7563
+  S2 K=20: name=0.1800  addr=0.7663  union=0.8109
+  S2 K=50: name=0.2980  addr=0.8068  union=0.8647
+  S3 K= 5: name=0.0601  addr=0.5450  union=0.5757
+  S3 K=10: name=0.1048  addr=0.6260  union=0.6674
+  S3 K=20: name=0.1663  addr=0.6891  union=0.7462
+  S3 K=50: name=0.2769  addr=0.7530  union=0.8293
+  S2+S3 name@20 U addr@20 overall pair recall: 0.7774   mean candidates per S1: 79.5
+  naive no-ML baseline (predict if w*name_cos+(1-w)*addr_cos >= t, tuned on these queries): macro F0.5=0.1509 at (w,t)=(np.float64(0.0), np.float64(0.3))
+  oracle F0.5 given these candidates (perfect classifier): 0.8926
+
+[India] S2 done at 260s
+[India] S3 done at 617s
+
+=== India: recall of true S{2,3} matches within top-K (name / address / union), 2000 queries
+  S2 K= 5: name=0.0358  addr=0.7310  union=0.7446
+  S2 K=10: name=0.0587  addr=0.7888  union=0.8057
+  S2 K=20: name=0.0978  addr=0.8279  union=0.8502
+  S2 K=50: name=0.1850  addr=0.8661  union=0.8944
+  S3 K= 5: name=0.0251  addr=0.5949  union=0.6024
+  S3 K=10: name=0.0401  addr=0.6609  union=0.6723
+  S3 K=20: name=0.0621  addr=0.7163  union=0.7339
+  S3 K=50: name=0.1325  addr=0.7745  union=0.8040
+  S2+S3 name@20 U addr@20 overall pair recall: 0.7898   mean candidates per S1: 79.8
+  naive no-ML baseline (predict if w*name_cos+(1-w)*addr_cos >= t, tuned on these queries): macro F0.5=0.0685 at (w,t)=(np.float64(0.0), np.float64(0.3))
+  oracle F0.5 given these candidates (perfect classifier): 0.8968
+

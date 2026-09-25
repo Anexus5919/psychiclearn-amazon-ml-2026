@@ -1,0 +1,74 @@
+GT rows: 2,206,821  unique S1: 2,206,821
+
+singletons (empty list): 123,247 (5.58%)  => 'predict all empty' baseline F0.5 = 0.0558
+total matched ids: 7,638,365   S2: 3,693,619  S3: 3,944,746  other: 0
+unique matched ids: 7,638,365  (== total => each S2/S3 record belongs to <=1 S1)
+
+list length distribution:
+    0:   123,247 ( 5.58%)
+    1:   119,157 ( 5.40%)
+    2:   375,212 (17.00%)
+    3:   530,841 (24.05%)
+    4:   484,115 (21.94%)
+    5:   321,957 (14.59%)
+    6:   164,868 ( 7.47%)
+    7:    63,968 ( 2.90%)
+    8:    18,680 ( 0.85%)
+    9:     4,205 ( 0.19%)
+   10:       534 ( 0.02%)
+   11:        37 ( 0.00%)
+mean list length (non-singletons): 3.666
+
+(#S2, #S3) joint distribution, top 20:
+  S2=1, S3=1:   269,681 (12.22%)
+  S2=1, S3=2:   251,224 (11.38%)
+  S2=2, S3=1:   223,054 (10.11%)
+  S2=2, S3=2:   208,159 ( 9.43%)
+  S2=1, S3=3:   140,393 ( 6.36%)
+  S2=0, S3=0:   123,247 ( 5.58%)
+  S2=2, S3=3:   116,076 ( 5.26%)
+  S2=3, S3=1:   114,405 ( 5.18%)
+  S2=3, S3=2:   105,817 ( 4.79%)
+  S2=0, S3=1:    60,407 ( 2.74%)
+  S2=3, S3=3:    59,427 ( 2.69%)
+  S2=1, S3=0:    58,750 ( 2.66%)
+  S2=0, S3=2:    57,041 ( 2.58%)
+  S2=1, S3=4:    54,575 ( 2.47%)
+  S2=2, S3=0:    48,490 ( 2.20%)
+  S2=2, S3=4:    45,167 ( 2.05%)
+  S2=4, S3=1:    40,618 ( 1.84%)
+  S2=4, S3=2:    38,338 ( 1.74%)
+  S2=0, S3=3:    31,526 ( 1.43%)
+  S2=3, S3=0:    25,037 ( 1.13%)
+  S1 with >=1 S2 match: 0.8696   with >=1 S3 match: 0.8793
+  S1 with S2 only: 0.0648  S3 only: 0.0745  both: 0.8048
+
+GT S1 ids found in train_source1: 2,206,821 / 2,206,821
+Spearman(GT row order, S1 file row order): 0.0003
+  country=India: n=883,188 singleton rate=0.0559  mean len(non-single)=3.670
+  country=US: n=1,323,633 singleton rate=0.0558  mean len(non-single)=3.664
+
+--- Source 2: file rows 5,034,616
+  matched ids found in file: 3,693,619 / 3,693,619
+  file records matched to some S1: 3,693,619 (73.36%)  -> rest are unmatched distractors
+  file country counts: {np.str_('India'): np.int64(2017799), np.str_('US'): np.int64(3016817)}
+  matched pair country agreement: 1.00000  (disagree n=0)
+  Spearman(S1 file pos, S2 file pos) over matched pairs: 0.0010
+  Spearman(S1 numeric id, S2 numeric id): 0.0001
+  within-cluster |row gap| median=1,087,819 (random expectation ~1,678,205); frac gap<=5: 0.0000
+
+--- Source 3: file rows 5,285,603
+  matched ids found in file: 3,944,746 / 3,944,746
+  file records matched to some S1: 3,944,746 (74.63%)  -> rest are unmatched distractors
+  file country counts: {np.str_('India'): np.int64(2115547), np.str_('US'): np.int64(3170056)}
+  matched pair country agreement: 1.00000  (disagree n=0)
+  Spearman(S1 file pos, S3 file pos) over matched pairs: -0.0007
+  Spearman(S1 numeric id, S3 numeric id): 0.0002
+  within-cluster |row gap| median=1,105,592 (random expectation ~1,761,868); frac gap<=5: 0.0000
+
+--- train/test ID overlap
+  source1: train 2,206,821  test 1,732,544  test ids also in train: 0
+  source2: train 5,034,616  test 4,887,273  test ids also in train: 0
+  source3: train 5,285,603  test 5,082,316  test ids also in train: 0
+  test S1 (name|address) exactly present in train S1: 0
+  test S1 lower(name) present in train S1 names: 585,588 / 1,732,544
