@@ -184,6 +184,20 @@ def block_partition(s1, pool, query_mask, cfg, log=print, tmp_dir=None):
         sparse.save_npz(os.path.join(tmp_dir, f"{kind}_p.npz"), p, compressed=False)
         del q, p, qa
 
+    if getattr(cfg, "exact_name_cap", 0) > 0:
+        # exact core-name key: rescues candidates whose address is empty or garbled (the error
+        # analysis showed exact-name records with empty addresses slipping past the TF-IDF passes);
+        # names shared by more than `exact_name_cap` pool records are skipped (generic names)
+        qn = pd.DataFrame({"s1": q_rows, "key": s1["name_core"].values[q_rows]})
+        pn = pd.DataFrame({"pool": np.arange(len(pool)), "key": pool["name_core"].values})
+        pn = pn[pn["key"].str.len() > 0]
+        pn = pn[pn["key"].map(pn["key"].value_counts()) <= cfg.exact_name_cap]
+        m = qn.merge(pn, on="key")
+        keys.append(m["s1"].values.astype(np.int64) * n_pool + m["pool"].values.astype(np.int64))
+        passes.append(np.full(len(m), 99, np.int8))  # adds pairs only; no rank column
+        ranks.append(np.ones(len(m), np.int16))
+        log(f"    pass exact: {len(m):,} pairs")
+
     all_keys = np.concatenate(keys)
     uniq, inv = np.unique(all_keys, return_inverse=True)
     all_pass, all_rank = np.concatenate(passes), np.concatenate(ranks)

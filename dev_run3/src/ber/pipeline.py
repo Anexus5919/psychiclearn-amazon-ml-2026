@@ -39,6 +39,8 @@ class Config:
     max_df_combo: float = 0.005
     n_folds: int = 4
     n_predict_models: int = 1
+    exact_name_cap: int = 0         # >0 enables the exact core-name retrieval pass
+    only_countries: str = ""        # comma list: restrict the pairs stage to these countries
     prune: bool = True              # learned pruning of candidates (smaller candidate_pairs.tsv)
     prune_max_recall_loss: float = 0.002
     seed: int = 42
@@ -166,7 +168,10 @@ def stage_pairs(cfg, splits=("train", "test")):
         countries = sorted(s1_meta["country"].unique())
         del s1_meta
         tmp_dir = io_utils.ensure_dir(os.path.join(cfg.work_dir, "tmp_block"))
+        only = {c for c in cfg.only_countries.split(",") if c}
         for country in countries:
+            if only and country not in only:
+                continue
             for src in (2, 3):
                 path = os.path.join(out, f"{country}_s{src}.parquet")
                 if os.path.exists(path):
@@ -306,11 +311,81 @@ def _write_pruned(cfg, split, rule, models=None, oof=None):
     log(f"pruned {split}: {kept:,} of {total:,} pairs kept ({kept / max(1, total):.1%})", cfg)
 
 
+CE_COLS = ["ce_p", "ce_rank", "ce_gap", "ce_n50"]
+
+
 def _main_inputs(cfg):
-    """(sub-directory, features) for the main matcher: pruned pairs + pre-ranker features if present."""
+    """(sub-directory, features) for the main matcher: pruned pairs + pre-ranker features, plus any
+    run-4 extra / cross-encoder columns present in the pruned files."""
     if cfg.prune and os.path.isdir(os.path.join(cfg.work_dir, "pairs_pruned", "test")):
-        return "pairs_pruned", features.FEATURES + ["pre_p", "pre_rank"]
+        import pyarrow.parquet as pq
+        from . import features_extra as fx
+        feats = features.FEATURES + ["pre_p", "pre_rank"]
+        f0 = sorted(glob.glob(os.path.join(cfg.work_dir, "pairs_pruned", "train", "[!_]*.parquet")))[0]
+        names = set(pq.ParquetFile(f0).schema_arrow.names)
+        feats += [c for c in fx.EXTRA + CE_COLS if c in names]
+        return "pairs_pruned", feats
     return "pairs", features.FEATURES
+
+
+def stage_augment(cfg):
+    """Append run-4 extra + group features to every pruned candidate file (idempotent)."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    from . import features_extra as fx
+    cols = ["entity_id", "name_core", "legal", "addr_core", "addr_nums", "addr_primary"]
+    for split in ("train", "test"):
+        for country, files in pair_files(cfg, split, "pairs_pruned").items():
+            path = files[0]
+            pf = pq.ParquetFile(path)
+            if "g_pre_max" in pf.schema_arrow.names:
+                continue
+            keys = pd.read_parquet(path, columns=["s1_id", "cand_id", "pre_p"])
+            G, top = fx.group_features(keys["s1_id"].values, keys["pre_p"].values, keys["cand_id"].values)
+            del keys
+            s1n = load_norm(cfg, split, 1, country=country, columns=cols).set_index("entity_id")
+            pooln = pd.concat([load_norm(cfg, split, 2, country=country, columns=cols),
+                               load_norm(cfg, split, 3, country=country, columns=cols)]).set_index("entity_id")
+            writer_, off = None, 0
+            for batch in pf.iter_batches(batch_size=1_000_000):
+                df = batch.to_pandas()
+                n = len(df)
+                P = fx.pair_features(df["s1_id"].values, df["cand_id"].values, top[off:off + n], s1n, pooln, cfg.n_jobs)
+                for c in fx.GROUP:
+                    df[c] = G[c].values[off:off + n]
+                for c in fx.PAIR:
+                    df[c] = P[c].values
+                tb = pa.Table.from_pandas(df, preserve_index=False)
+                writer_ = writer_ or pq.ParquetWriter(path + ".aug", tb.schema)
+                writer_.write_table(tb)
+                off += n
+            writer_.close()
+            del pf
+            os.replace(path + ".aug", path)
+            log(f"  augmented {split} {country}: {off:,} pairs", cfg)
+    log("augment done", cfg)
+
+
+def stage_augment_ce(cfg, ce_dir):
+    """Merge cross-encoder scores (ce_dir/<split>.parquet: s1_id, cand_id, ce_p) into the pruned files;
+    unscored pairs get NaN. Adds per-entity rank / gap-to-best / count>=0.5 of the CE score."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    for split in ("train", "test"):
+        ce = pd.read_parquet(os.path.join(ce_dir, f"{split}.parquet"))
+        for country, files in pair_files(cfg, split, "pairs_pruned").items():
+            path = files[0]
+            df = pd.read_parquet(path)
+            df = df.drop(columns=[c for c in CE_COLS if c in df.columns])
+            df = df.merge(ce, on=["s1_id", "cand_id"], how="left")
+            g = df.groupby("s1_id")["ce_p"]
+            df["ce_rank"] = g.rank(ascending=False, method="min").astype(np.float32)
+            df["ce_gap"] = (g.transform("max") - df["ce_p"]).astype(np.float32)
+            df["ce_n50"] = (df["ce_p"] >= 0.5).astype(np.float32).groupby(df["s1_id"]).transform("sum")
+            df.to_parquet(path + ".ce", index=False)
+            del df
+            os.replace(path + ".ce", path)
+            log(f"  ce scores merged: {split} {country}", cfg)
 
 
 # ------------------------------------------------------------------ stage 3: train + validate
@@ -412,14 +487,15 @@ def main():
     ap.add_argument("--data-dir", required=True)
     ap.add_argument("--work-dir", required=True)
     ap.add_argument("--out-dir", required=True)
-    ap.add_argument("--stage", default="all", choices=["prepare", "pairs", "prune", "train", "predict", "all"])
+    ap.add_argument("--stage", default="all", choices=["prepare", "pairs", "prune", "augment", "augment_ce", "train", "predict", "all"])
+    ap.add_argument("--ce-dir", default=None, help="directory with cross-encoder scores (train.parquet, test.parquet)")
     for name, typ in (("n_jobs", int), ("train_frac", float), ("k_name", int), ("k_addr", int), ("k_combo", int),
-                      ("k_reverse", int), ("max_df_name", float), ("max_df_addr", float), ("max_df_combo", float),
+                      ("k_reverse", int), ("exact_name_cap", int), ("only_countries", str), ("max_df_name", float), ("max_df_addr", float), ("max_df_combo", float),
                       ("n_folds", int), ("n_predict_models", int), ("seed", int)):
         ap.add_argument("--" + name.replace("_", "-"), type=typ, default=None)
     a = ap.parse_args()
     cfg = Config(a.data_dir, a.work_dir, a.out_dir)
-    for k in ("n_jobs", "train_frac", "k_name", "k_addr", "k_combo", "k_reverse", "max_df_name", "max_df_addr",
+    for k in ("n_jobs", "train_frac", "k_name", "k_addr", "k_combo", "k_reverse", "exact_name_cap", "only_countries", "max_df_name", "max_df_addr",
               "max_df_combo", "n_folds", "n_predict_models", "seed"):
         if getattr(a, k) is not None:
             setattr(cfg, k, getattr(a, k))
@@ -432,6 +508,10 @@ def main():
         stage_pairs(cfg)
     if a.stage == "prune" or (a.stage == "all" and cfg.prune):
         stage_prune(cfg)
+    if a.stage == "augment":
+        stage_augment(cfg)
+    if a.stage == "augment_ce":
+        stage_augment_ce(cfg, a.ce_dir)
     if a.stage in ("train", "all"):
         stage_train(cfg)
     if a.stage in ("predict", "all"):
