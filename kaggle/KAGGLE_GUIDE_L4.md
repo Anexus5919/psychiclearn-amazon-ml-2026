@@ -13,8 +13,8 @@ Kaggle gives two T4 GPUs (16 GB each) for free, and the job keeps running after 
 
 | Phase | When | Kaggle runtime (estimate) |
 |---|---|---|
-| 1. Train | as soon as `ce_train.parquet` is in `from_L1/` | about 1-2 h |
-| 2. Score | when `score_train.parquet` + `score_test.parquet` appear in `from_L1/` | about 0.5-1 h |
+| 1. Train | as soon as `ce_train.parquet` is in release `from-L1` | about 1-2 h |
+| 2. Score | when `score_train.parquet` + `score_test.parquet` appear in release `from-L1` | about 0.5-1 h |
 
 The runtimes are estimates, because this model has never been run on a T4. The log shows the real ETA.
 
@@ -27,7 +27,7 @@ The runtimes are estimates, because this model has never been run on a T4. The l
 - **Free tiers only.** Do not buy anything (no Colab Pro, no paid GPUs).
 - **Don't change the script** except the `SMOKE` line and the fixes listed under Troubleshooting. If
   something else seems wrong, message Adarsh first.
-- **Only write to your own Drive folder:** `PsychicLearn_share/from_L4/`.
+- **Only upload to your own GitHub release:** `from-L4` (see Step 0 for how).
 
 ---
 
@@ -36,10 +36,13 @@ The runtimes are estimates, because this model has never been run on a T4. The l
 1. Create an account at kaggle.com, or log in.
 2. **Verify your phone number:** profile picture, then Settings, then Phone verification. Without this, the
    GPU and Internet options stay greyed out.
-3. Get two files:
-   - `ce_train.parquet` from Drive `PsychicLearn_share/from_L1/`. It is about 1.02M labelled pairs,
-     roughly 50-150 MB.
-   - `mdeberta_cross_encoder.py` from the GitHub repo, folder `kaggle/`.
+3. Accept Adarsh's invite to the private repo `Anexus5919/psychiclearn-amazon-ml-2026`. The email or
+   notification comes from GitHub.
+4. Get two files from the repo:
+   - **`ce_train.parquet`:** repo page, then **Releases** (right sidebar), then **`from-L1`**, then click
+     `ce_train.parquet` under *Assets*. It is about 1.02M labelled pairs, roughly 50-150 MB.
+   - **The script:** the folder `kaggle/`, file `mdeberta_cross_encoder.py`. Open it and use the **Raw**
+     button or the copy icon.
 
 ## Step 1: upload the training data as a private dataset
 
@@ -90,7 +93,7 @@ This catches problems in 5 minutes instead of 2 hours.
 
 ## Step 5: scoring run (phase 2)
 
-Start this when Adarsh posts `score_train.parquet` and `score_test.parquet` in `from_L1/`.
+Start this when Adarsh posts `score_train.parquet` and `score_test.parquet` in release `from-L1`.
 
 1. Add the score files to your dataset:
    1. Open your dataset `psychiclearn-ce`.
@@ -109,7 +112,9 @@ Start this when Adarsh posts `score_train.parquet` and `score_test.parquet` in `
    - If it starts training instead, the model input is not attached. Cancel the run and repeat step 4.
 7. At the end, the log shows `scored train: ... pairs` and `scored test: ... pairs`, then `ALL DONE`.
 8. From the version's **Output** tab, download `ce2_train.parquet` and `ce2_test.parquet`.
-9. Upload both files to Drive `PsychicLearn_share/from_L4/`. Add a short `notes.txt` with:
+9. Upload both files to **your** release: repo page, then **Releases**, then **`from-L4`**, then the pencil
+   icon (Edit), then drag the files into *Attach binaries*, then **Update release**. In the release
+   description, write:
    - the phase-1 training time and final loss;
    - the phase-2 scoring time;
    - anything odd you noticed.

@@ -68,9 +68,16 @@ L1 finalises it.
      `pip install torch --index-url https://download.pytorch.org/whl/cu128` then
      `pip install transformers==4.57.1 sentencepiece protobuf`.
      Check it with `python -c "import torch; print(torch.cuda.get_device_name(0), torch.cuda.get_device_properties(0).total_memory/1e9)"`.
-3. **Shared data folder.** Adarsh shares a Google Drive folder `PsychicLearn_share/` with sub-folders
-   `from_L1/`, `from_L2/`, `from_L3/`, `from_L4/`.
-   - Only write into **your own** `from_Lx/` folder.
+3. **Shared files = GitHub Releases** (no Google Drive). Big data files cannot go into git itself (100 MB
+   limit), so each person has one **release** in our repo, used as a file drop:
+   `from-L1` (Adarsh), `from-L2`, `from-L3`, `from-L4`. Each file can be up to 2 GB, and it's free.
+   - **Download:** repo page, then **Releases** (right sidebar), then e.g. `from-L1`, then click the file
+     under *Assets*. Or with the GitHub CLI:
+     `gh release download from-L1 -p "ce_train.parquet" -R Anexus5919/psychiclearn-amazon-ml-2026`
+   - **Upload (only to your own release):** Releases, then your `from-Lx`, then the pencil icon (Edit),
+     then drag the files into *Attach binaries*, then **Update release**. Or:
+     `gh release upload from-L4 ce2_train.parquet ce2_test.parquet --clobber -R Anexus5919/psychiclearn-amazon-ml-2026`
+   - Small files (code, params `.json`, notes) go on your git branch as usual.
    - Nobody needs the raw dataset except L1, but it is on the challenge portal if you want to look.
 4. **Rules:**
    - Never log in to the Unstop account (simultaneous logins can disqualify us).
@@ -87,7 +94,7 @@ L1 finalises it.
 match ≥ t1 + later matches ≥ t2". The error analysis showed that **missed matches cost 1.6 points** and
 **false merges cost 0.8**, so better decisions on the same probabilities can gain points for free.
 
-**Inputs** (`from_L1/`):
+**Inputs** (release `from-L1`):
 
 | File | Columns | Size |
 |---|---|---|
@@ -110,7 +117,7 @@ match ≥ t1 + later matches ≥ t2". The error analysis showed that **missed ma
 3. Guard against overfitting: tune on half of the businesses (e.g. `hash(s1_id) % 2 == 0`) and report the
    score on the other half.
 
-**Output** (`from_L2/` + branch `feat/decision`):
+**Output** (release `from-L2` + branch `feat/decision`):
 - `decide.py` with a new function `decide_v2(df, params)`; unit tests keep passing;
 - `decision_params.json`;
 - a short note: old vs new F0.5 on the held-out half.
@@ -123,7 +130,7 @@ match ≥ t1 + later matches ≥ t2". The error analysis showed that **missed ma
 **Why.** LightGBM runs with hand-picked settings. Tuning plus a different algorithm (CatBoost) usually
 adds a few tenths of a point, and averaging two good models is safer than one.
 
-**Input** (`from_L1/`): `run3_train_features.parquet`, about 3.1M rows. It has all feature columns plus
+**Input** (release `from-L1`): `run3_train_features.parquet`, about 3.1M rows. It has all feature columns plus
 `s1_id`, `cand_id`, `label`, and the list of feature names in `features.json`.
 
 **Steps:**
@@ -144,7 +151,7 @@ adds a few tenths of a point, and averaging two good models is safer than one.
    `depth 8, lr 0.08, 2000 iters, early stopping`). Report its OOF log-loss and the log-loss of the average
    `0.5·LGB + 0.5·CB`.
 
-**Output** (`from_L3/` + branch `feat/gbdt`):
+**Output** (release `from-L3` + branch `feat/gbdt`):
 - `lgb_params.json`;
 - the CatBoost settings;
 - an OOF comparison table;
@@ -159,7 +166,7 @@ on it. The run-4 features are the ones used in the final run.
 digits, duplicated words and transliteration. Our small model (e5-small) is training on L1 now. The
 **stronger mDeBERTa-v3-base (MIT, 280M)** needs more GPU memory than L1 has.
 
-**Inputs** (`from_L1/`):
+**Inputs** (release `from-L1`):
 
 | File | Columns | When |
 |---|---|---|
@@ -173,7 +180,7 @@ digits, duplicated words and transliteration. Our small model (e5-small) is trai
 **Script:** `kaggle/mdeberta_cross_encoder.py` in the repo.
 - **Local:**
   ```bash
-  set BER_IN=C:\path\to\from_L1
+  set BER_IN=C:\path\to\downloaded_files
   set BER_OUT=C:\path\to\out
   python kaggle/mdeberta_cross_encoder.py
   ```
@@ -186,7 +193,7 @@ digits, duplicated words and transliteration. Our small model (e5-small) is trai
   `mdeberta_ce/`, switches to SCORE-ONLY mode and writes `ce2_train.parquet` / `ce2_test.parquet`
   (estimate 0.5–1 h).
 
-**Output** (`from_L4/`): `ce2_train.parquet` and `ce2_test.parquet` (`s1_id, cand_id, ce_p`), plus a note
+**Output** (release `from-L4`): `ce2_train.parquet` and `ce2_test.parquet` (`s1_id, cand_id, ce_p`), plus a note
 of the training time and final loss.
 
 ### L1: head chef (Adarsh's laptop, with Claude)
@@ -218,7 +225,7 @@ of the training time and final loss.
 ## 5. Clash-proof rules
 
 1. **Code:** each person works on their own branch and in their own files. L1 merges through pull requests.
-2. **Data:** never edit another person's file. Write new files into your own `from_Lx/` folder, named
+2. **Data:** never edit another person's file. Write new files into your own `from-Lx` release, named
    exactly as in the task cards.
 3. **Same folds everywhere:** `fold_ids(s1_id, 4, seed 42)`. Otherwise validation numbers aren't comparable.
 4. **Same metric everywhere:** `ber/scoring.py`. Every claim of improvement comes with **old vs new F0.5
