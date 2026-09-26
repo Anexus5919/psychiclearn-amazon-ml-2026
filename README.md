@@ -8,16 +8,23 @@ Private team repository. For each Source-1 business record, the task is to find 
 |---|---|---|---|
 | Run 2 | Baseline: word/char TF-IDF retrieval → LightGBM → exclusive assignment + rank thresholds | 0.9515 (US 0.973, India 0.920) | **0.931** |
 | Run 3 | + learned Indic→Latin transliteration (India), + learned pruning (54 → 18 candidates per S1) | 0.9613 (US 0.973, India 0.944) | **0.941** |
+| Run 4 | + e5-small cross-encoder (MIT, 118M; stacked as a feature), bigger India search + exact-name pass, 304k training businesses, 16 new features | **0.9763** (US 0.982, India 0.967) | **0.963** |
+| Run 5 | + state/region-restricted name search, exact-name pass everywhere, look-alike/ID-tag name clean-up, wider e5 band, candidate file 22.6 → ~7 per S1 | running (26 Sep 16:32 →) | – |
+
+France has no training labels. Worked out from the leaderboard, it scores ≈0.85 (run 3) and ≈0.90 (run 4). Full story and metrics: `JOURNEY.md`. Plan: `TEAM_PLAN.md` §7.
 
 ## Layout
 
 | Folder | Contents |
 |---|---|
 | `submission/` | Final-package structure. `code/business_entity_resolution/` is the version that produced the LB 0.931 file. `output/` stays empty here: the data files are too big for git. |
-| `dev_run3/` | Newest code: transliteration, learned pruning, cross-encoder (`ber/cross_encoder.py`), run-4 extra/group features (`ber/features_extra.py`), exports (`ber/ce_export.py`). It moves into `submission/` once validated. |
+| `dev_run3/` | Run-3 code snapshot |
+| `dev_run4/` | Run-4 code snapshot (cross-encoder, extra/group features, exports) |
+| `dev_run5/` | **Newest code** (run 5: `ber/regions.py`, region pass in `ber/blocking.py`, `--ce-prefix ce2`, candidate trimming) + `scripts/` (run chain, error analyses, pseudo-label proxy test). It moves into `submission/` once validated. |
 | `analysis/` | `ER_Solution_Blueprint.md` (full problem analysis and plan) plus the EDA scripts and their outputs |
-| `results/` | Gzipped `matching_results.tsv` of runs 2 and 3, plus run 3's validation report and pruning rule |
-| `kaggle/` | mDeBERTa cross-encoder script (Kaggle or any GPU) |
+| `results/` | Gzipped `matching_results.tsv` of runs 2–4, validation reports and pruning rules, run-4 error analysis, pseudo-label proxy test, name-crowding measurement |
+| `kaggle/` | Cross-encoder script for Kaggle (train + score, or score-only with an attached model) and `KAGGLE_GUIDE_L4.md` |
+| Releases `from-L1` … `from-L4` | Big data files shared between teammates (validation data, features, cross-encoder inputs/outputs) |
 | `TEAM_PLAN.md` | **Who does what, in parallel, until the deadline** |
 | `HANDOFF.md` | Current state, paths and next steps |
 
@@ -34,6 +41,7 @@ python -m ber.pipeline --data-dir <dataset> --work-dir <scratch> --out-dir <outp
 
 ## Rules we follow
 
-- No external data, APIs or pretrained models; everything is learned from the provided files.
+- No external data or APIs. Everything is learned from the provided files.
+- Pretrained models only if MIT/Apache and ≤ 8B parameters. Used: `intfloat/multilingual-e5-small` (MIT, 118M) from run 4 onwards; `microsoft/mdeberta-v3-base` (MIT, 280M) if it passes validation. Both are fine-tuned on the provided training data only.
 - Output TSVs use LF line endings. Run `utils/validate_submission.py --check-ids` before every upload.
 - The last leaderboard upload must be our best-validated file.

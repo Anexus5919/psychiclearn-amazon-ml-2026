@@ -1,13 +1,16 @@
 # PsychicLearn: What We Did, Start to Finish (so far)
 
 Amazon ML Challenge 2026, Business Entity Resolution. Written 26 Sep 2026, around 03:00 IST.
+**Updated 26 Sep 2026, ~17:00 IST:** sections 9–14 are new (run 4, error analysis, team results, experiments, run 5).
 
 | Upload | Time | What it was | Public leaderboard (F0.5) |
 |---|---|---|---|
 | #1 | 25 Sep, 23:59 | Run 2: first complete pipeline | **0.931** |
 | #2 | 26 Sep, 02:50 | Run 3: + transliteration for India, + candidate pruning | **0.941** |
+| #3 | 26 Sep, 15:44 | Run 4: + e5 cross-encoder, bigger India search, more training data, new features | **0.963** |
 
 The leaderboard top was about 0.988 at the time of writing. Time remaining: about 45 hours (the deadline is 27 Sep, 23:59 IST).
+*Update 26 Sep ~17:00:* leaderboard top 0.9906; about 31 hours remain.
 
 ---
 
@@ -71,7 +74,7 @@ We also caught a data trap: the files use Windows line endings (CRLF). If our ou
 
 ## 4. How our pipeline works (the approach)
 
-Everything is written in Python. It uses **no external data, APIs or pretrained models**, which the fair-play rules require. The pipeline has 6 stages:
+Everything is written in Python. Runs 1–3 used **no external data, APIs or pretrained models**. *Correction (run 4 onwards):* we also use one **pretrained model**, `multilingual-e5-small` (MIT licence, 118M parameters, within the rules: MIT/Apache, ≤ 8B parameters). It is fine-tuned on the provided training data only (§9). Still no external data or APIs. The pipeline has 6 stages:
 
 ### Stage 1: Normalisation (cleaning the text)
 
@@ -212,7 +215,7 @@ Our offline validation predicts the leaderboard well, so we can test ideas offli
 
 ---
 
-## 8. What's next (and how long it takes)
+## 8. What's next (as planned at 03:00; superseded by §13–§14)
 
 | Next step | Why | Time (coding + compute) |
 |---|---|---|
@@ -223,6 +226,129 @@ Our offline validation predicts the leaderboard well, so we can test ideas offli
 | Final package: zip + filled documentation + final upload | Required deliverable | ~1–1.5 h |
 
 Realistic target: **0.96–0.975**. Getting to ~0.985 depends on how much of France and the group structure we can fix in the time left.
+
+---
+
+## 9. Run 4: first neural model (e5 cross-encoder) → **LB 0.963**
+
+Run 4 was built from the run-3 error analysis. Removing every false merge was worth +0.8 validation
+points, accepting every true match the model had rejected +1.6, and the candidate oracle was 0.985.
+
+**What changed:**
+
+| Change | Detail |
+|---|---|
+| Bigger India search | name/address/combined top-k 15/15/20 (was 10/10/15) + an **exact-name pass** (same normalised name, max 50 records per name). India test candidates before pruning: 60.4M pairs (S2+S3). |
+| More training data | **304,555** training businesses (was 176,546): India 121,885, US 182,670 |
+| New features | 16 run-4 features: duplicated-word and core-name checks, legal-form conflict, house-number suffix and 1-digit-edit checks, similarity to the best candidate, and group features from the pre-ranker (max, gap, share, count ≥ 0.5 …) |
+| **Cross-encoder (e5)** | `intfloat/multilingual-e5-small` (**MIT licence, 118M parameters, pretrained**), fine-tuned on **1,023,262 labelled pairs** from 60,908 training businesses that the main model never trains on (clean stacking). It reads both records side by side and outputs a match probability. Training: laptop GPU (RTX 3050 6 GB, bf16), ~312 pairs/s, final loss ≈0.004. |
+| Scoring with e5 | only the "uncertain" pairs (pre-ranker p in [0.02, 0.995]): **1.90M train + 13.28M test** pairs. Test scoring ran on **Kaggle 2×T4** (92 min). Kaggle and laptop scores agree to a mean difference of 0.0001. |
+
+**Results:**
+
+| | Run 3 | **Run 4** |
+|---|---|---|
+| Validation F0.5 (OOF) | 0.9613 | **0.9763** (t1 0.54, t2 0.74) |
+| India | 0.9443 | **0.9671** (retrieval ceiling 0.9770) |
+| US | 0.9726 | **0.9824** (retrieval ceiling 0.9941) |
+| True matches retrieved (pair recall) | 0.9595 | 0.9657 |
+| LightGBM validation log-loss per fold | 0.025–0.028 | **0.011** |
+| Candidates per business | 18.0 | 22.6 |
+| Public leaderboard | 0.941 | **0.963** (upload #3, 26 Sep 15:44) |
+| France (worked out from the leaderboard) | ≈0.85 | **≈0.90** |
+
+- The most important feature by far is the e5 score `ce_p`: about 3× the pre-ranker score and >10× every hand-made feature.
+- Run 4 predicts 3.22 matches per business on average: France 3.00, India 3.20, US 3.34.
+- The official validator passed with `--check-ids`.
+
+## 10. Where the remaining errors are (run-4 analysis)
+
+**Error budget on validation data:**
+
+| | India | US |
+|---|---|---|
+| True matches **never retrieved** | 23,602 = **5.59%** | 11,004 = 1.74% |
+| True matches dropped by pruning | 1,133 = 0.27% | 463 = 0.07% |
+| Gain if every false merge were removed | +0.0035 | +0.0030 |
+| Gain if every retrieved-but-rejected true match were accepted | +0.0064 | +0.0087 |
+
+**Why were true matches never retrieved?** Missed pairs compared with found pairs:
+
+| | India missed | India found | US missed | US found |
+|---|---|---|---|---|
+| Names near-identical after cleaning (similarity ≥ 90) | **75.8%** | 84.4% | **57.9%** | 82.9% |
+| Candidate address empty | 19.2% | 3.1% | 45.8% | 4.2% |
+| Candidate name in an Indic script | 34.0% | 17.3% | – | – |
+
+**The main cause is crowding.** Names like "Surya Healthcare", "Blue Infra" or "Apex" exist hundreds
+of times per country, so the right record falls out of the country-wide top-k name list. The city and
+state words that would separate them are too common for the search index, so they get ignored.
+
+**The noise is synthetic.** We see the same operations again and again:
+- names rewritten in Indic scripts, with the address cut to "door no, city, state code" (`सिटी फूड्स प्राइवेट लिमिटेड ; 5, Mumbai, MH`);
+- junk added to names: `***`, `--`, `Mr`, `(ID: 64721)`, or appended words (Service, Center, Partners…);
+- look-alike characters: `R0OPESH`, `Internati0na1`;
+- dropped or duplicated words (`Pvt Pvt Ltd`);
+- the name replaced by gibberish at the same address.
+
+**Name crowding per country** (share of test S2 records whose exact name is shared by more than 15 others):
+
+| | Country-wide | Within the state/region |
+|---|---|---|
+| France | 19.5% | **12.7%** (only 3 regions) |
+| India | 24.3% | 7.9% |
+| US | 9.5% | 0.7% |
+
+## 11. Team results so far
+
+| Teammate | Task | Result |
+|---|---|---|
+| L2 | Decision layer on run-3 validation data | Baseline reproduced exactly (0.961270). Best variant: per-source thresholds S2 0.66 / S3 0.70 + 0.76 for rank ≥ 3, scoring 0.961311 on held-out folds. That is **+0.00004, which is noise**, and it was compared with the full-data baseline rather than the old rule on the same folds. Other methods: prob-sum −0.0028, expected-F0.5 −0.055. **Conclusion:** thresholds are exhausted. Only 0.2% of pairs fall between 0.65 and 0.75, so our errors are *confident* errors. Not merged. |
+| L3 | GBDT tuning | not reported yet |
+| L4 | mDeBERTa-v3-base (MIT, 280M) cross-encoder on Kaggle | training and scoring in progress |
+
+## 12. Experiments that did **not** help (kept on record)
+
+| Idea | Test | Result | Decision |
+|---|---|---|---|
+| **France pseudo-labelling** (retrain with our own confident French predictions) | Proxy with the US as the "unlabelled" country: India-only model 0.97782 on US; + pseudo-labels (99.74% correct) 0.97667 (**−0.0012**); looser variant 0.97684 (−0.0010) | worse | **dropped** |
+| Decision-threshold tuning | L2, §11 | +0.00004 | not merged |
+| City-level search for France | name crowding 12.7% (region) → ~9.8% (city, estimate) | small | not worth a re-run |
+
+Side finding: a model trained only on India already scores 0.978 on the US, so the model transfers
+across countries. France's weakness is therefore more likely its very generic names than its language.
+
+## 13. Run 5 (running since 26 Sep 16:32)
+
+| Change | Why | Evidence |
+|---|---|---|
+| **State/region-restricted name search** (k=10 per state) | fixes crowding (§10) | held-out true pairs: same region **98.4%** (India) / **93.1%** (US) when both are known; region found for 85% / 95% of pairs; France pools 96% |
+| Exact-name pass for **all** countries (was India only) | US/France crowding | – |
+| Retrieval-only name clean-up: look-alike digits (`0→o 1→l 3→e 4→a 5→s 7→t` inside words) and `(ID: n)` tags | synthetic noise (§10) | e.g. `internati0na1` → `international` |
+| e5 band widened to [0.005, 0.995] | some rejected true matches had p < 0.02 and were never seen by e5 | run-4 e5 scores reused; only new pairs are scored |
+| `candidate_pairs.tsv` keeps pairs with p ≥ 0.0001 | smaller candidate sets rank higher | run-4 validation: **22.6 → 7.3** candidates per business, true-match loss 0.003% |
+
+Expected: validation above 0.9763 and a **leaderboard around 0.966–0.972**. This is an estimate, and
+it will be confirmed or corrected by the validation score around 21:00. Run 5 is uploaded only if it
+beats run 4 on validation.
+
+## 14. Where everything is now, and what's next
+
+| What | Where |
+|---|---|
+| Run-4 outputs (LB 0.963, current best) | `Downloads\PsychicLearn_run4_output\` |
+| Run-5 work dir / outputs | `Downloads\PsychicLearn_work5\` / `Downloads\PsychicLearn_run5_output\` |
+| Newest code | `Downloads\PsychicLearn_dev\src\`, repo `dev_run5/` |
+| Files for teammates | GitHub release `from-L1` (run-3 and run-4 validation data, features, cross-encoder inputs) |
+| Metrics and analyses | repo `results/` |
+
+**Next:**
+1. Run 5 validation → upload #4 if better.
+2. L4's mDeBERTa scores → run 6 (`--ce-prefix ce2`) → upload if the validation gain is ≥ +0.0005.
+3. 27 Sep: final package. The README must no longer claim "no pretrained models". Then the documentation, the zip, and a final upload of the best-validated file. Experiments stop at 20:00 IST.
+
+The full plan is in `TEAM_PLAN.md` §7. Realistic target: **≈0.97–0.975**. 0.99 would need France near
+0.99 without French labels; §10 and §12 explain why that is out of reach for us in the time left.
 
 ---
 
@@ -239,3 +365,8 @@ Realistic target: **0.96–0.975**. Getting to ~0.985 depends on how much of Fra
 | **Transliteration** | Converting text from one script to another (Devanagari → Latin letters) |
 | **Pruning / pre-ranker** | A small model that trims the candidate list before the main model |
 | **Zero-shot** | Working on a category never seen in training (here: France) |
+| **Cross-encoder** | A neural model that reads both records together and outputs a match probability (our e5 and mDeBERTa) |
+| **Stacking** | Feeding one model's prediction into another model as a feature (e5 score → LightGBM) |
+| **Pseudo-labelling** | Training on the model's own confident predictions for unlabelled data (tested for France; it hurt) |
+| **Crowding** | The right record falls out of the top-k list because many other records have the same name |
+| **Region pass** | Name search restricted to one state/region, to beat crowding (run 5) |

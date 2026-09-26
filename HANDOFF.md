@@ -1,36 +1,43 @@
 # PsychicLearn — handoff (Amazon ML Challenge 2026, deadline 27 Sep 23:59 IST)
 
-## Where things are
+*Updated 26 Sep 2026, ~17:00 IST. Full story: `JOURNEY.md`. Work plan: `TEAM_PLAN.md` (§7 = current plan).*
+
+## Scores so far
+| Upload | Run | Validation F0.5 (OOF) | Public LB |
+|---|---|---|---|
+| #1 (25 Sep 23:59) | Run 2 | 0.9515 (US 0.9727, India 0.9196) | 0.931 |
+| #2 (26 Sep 02:50) | Run 3 | 0.9613 (US 0.9726, India 0.9443) | 0.941 |
+| **#3 (26 Sep 15:44)** | **Run 4** | **0.97628** (US 0.9824, India 0.9671; t1 0.54, t2 0.74) | **0.963 (current best)** |
+
+- France (no labels) worked out from the LB: ≈0.85 (run 3) → ≈0.90 (run 4).
+- LB top 0.9906 (26 Sep afternoon). Uploads used: 1 on 25 Sep, 2 on 26 Sep (limit 5/day).
+
+## Where things are (L1 laptop)
 | Item | Path |
 |---|---|
 | Dataset (read-only, keep untouched) | `Downloads\6ab10eb3b23ba_student_resource\student_resource\dataset\` |
-| Blueprint + EDA | `Downloads\amazon_ml_2026_analysis\` |
-| **Submission package (final zip source)** | `Downloads\PsychicLearn_submission\` (code = run-2 version; `output\` = run-2 files, LB 0.931) |
-| **Run-3 code (newer: transliteration + pruning)** | `Downloads\PsychicLearn_dev\src\` (copy into the package once run 3 is validated) |
-| Run-2 work dir | `Downloads\PsychicLearn_work\` |
-| Run-3 work dir / outputs | `Downloads\PsychicLearn_work3\` / `Downloads\PsychicLearn_run3_output\` |
-| Python env (pinned reqs) | `...\scratchpad\berenv\Scripts\python.exe` (uv venv, py3.12) |
+| Newest code | `Downloads\PsychicLearn_dev\src\` (repo: `dev_run5/`) |
+| Run-4 work dir / outputs (best so far) | `Downloads\PsychicLearn_work4\` / `Downloads\PsychicLearn_run4_output\` |
+| Run-5 work dir / outputs (running) | `Downloads\PsychicLearn_work5\` / `Downloads\PsychicLearn_run5_output\` |
+| e5 cross-encoder model | `Downloads\PsychicLearn_work_ce\ce_e5small\` |
+| e5 scores (Kaggle) | `Downloads\PsychicLearn_work4\ce\{train,test}.parquet` |
+| Files shared with the team | GitHub release `from-L1` (staged in `Downloads\PsychicLearn_share\from_L1\`) |
+| Submission package (final zip source) | `Downloads\PsychicLearn_submission\` (still run-2 code: update on 27 Sep) |
 
-## Scores so far
-- Run 2: OOF F0.5 0.9515 (US 0.9727, India 0.9196); **public LB 0.931** (submitted 25 Sep 23:59). France inferred ≈0.86–0.90 (weakest).
-- **Run 3: OOF 0.9613 (US 0.9726, India 0.9443); 18.0 candidates per S1 (pruned from 53.5; rule top-30 & p≥0.001, 0.18% recall loss); public LB 0.941** (submitted 26 Sep 02:50). Output: `Downloads\PsychicLearn_run3_output\` (validator PASS). This is currently our best file.
-- Pruning frontier: 0.5% loss → 11.9 cand/S1; 1% loss → 10.0 cand/S1.
-- LB top ≈ 0.988 (26 Sep ~00:30). Uploads used: 1 on 25th, 1 on 26th (limit 5/day).
+## Run 5 (running since 26 Sep 16:32; ETA ~21:00)
+`run5_chain.sh` (copy in `dev_run5/scripts/`): pairs (India k 15/15/20; US/France 10/10/15; exact-name cap 50; **region pass k 10**) → prune → e5 band [0.005, 0.995] (run-4 scores reused, new pairs scored on the GPU while `augment` runs) → augment_ce → train → predict (`candidate_pairs.tsv` keeps p ≥ 0.0001) → validator.
+Resume one stage: `python -m ber.pipeline --data-dir <dataset> --work-dir <work5> --out-dir <run5_output> --exact-name-cap 50 --k-region 10 --stage <stage>`.
+**Upload only if OOF > 0.97628.**
 
-## Run 3 (COMPLETE: started 26 Sep ~00:20, finished 02:47)
-Stages: prepare (learned translit, leak-free) → pairs (India re-blocked; US/France reused from run 2) → prune (pre-ranker keeps ~top-N per S1 with ≤0.2% recall loss; rule + frontier in `work3\prune\rule.json` and log) → train → predict.
-Resume / finish any unfinished stages (each stage skips finished partitions):
-```
-cd Downloads\PsychicLearn_dev\src
-<berenv python> -m ber.pipeline --data-dir <dataset> --work-dir C:\Users\ANEXUS\Downloads\PsychicLearn_work3 --out-dir C:\Users\ANEXUS\Downloads\PsychicLearn_run3_output --stage <prune|train|predict>
-```
-Then validate: from `student_resource\`: `python utils/validate_submission.py --matching <run3_output>\matching_results.tsv --candidate NONE --test-dir dataset/test --check-ids`
+## Decided
+- France pseudo-labelling: **rejected** (proxy test: −0.0012 F0.5).
+- L2 threshold variants: +0.00004 (noise) → not merged.
+- Candidate trimming p ≥ 0.0001: 22.6 → 7.3 candidates/S1 for a 0.003% recall loss → used from run 5.
 
-## Next ideas (in order)
-1. Inspect France predictions (empty-rate, sample matches) → fix over/under-matching.
-2. Choose pruning budget from the frontier (smaller candidate sets rank higher per organisers' update).
-3. Bigger retrieval budgets / reverse pass for India recall; decision tuning.
-4. Final: copy best code into package, fill `Documentation_template.md`, build `PsychicLearn_submission.zip` (no __MACOSX/.DS_Store), make the LAST leaderboard upload the best-validated file.
+## Next
+1. Run 5 → validator → upload #4 if better.
+2. L4 `ce2_*` (mDeBERTa) → `--stage augment_ce --ce-dir <dir> --ce-prefix ce2` → train → predict → upload if OOF gain ≥ +0.0005.
+3. 27 Sep: copy the best code into the package; **fix the package README** (it still says "no pretrained models, CPU only"); documentation; `PsychicLearn_submission.zip`; last upload = best-validated file. Experiments stop 20:00 IST.
 
 ## Rules to remember
-No real money on AWS (Free plan only; never upgrade/join Organizations). Heavy compute runs on this laptop. No external data/APIs. Output files LF-only.
+No real money (AWS Free plan only; free Kaggle only). No external data/APIs; pretrained models only MIT/Apache ≤ 8B. Output files LF-only; validator with `--check-ids` before every upload. Only Adarsh uploads.

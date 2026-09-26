@@ -1,0 +1,9 @@
+rows: India 1,548,491  US 1,908,385
+A  India-only model on US:              F0.5 = 0.97782
+B pseudo-labels: 299,371 positives (true-label precision 0.9974), 1,570,355 negatives (true-label NPV 0.9984)
+B  India + US pseudo-labels, on US:     F0.5 = 0.97667  (-0.00115 vs A)
+C pseudo-labels: 301,646 positives (true-label precision 0.9958), 1,580,890 negatives (true-label NPV 0.9979)
+C  India + US pseudo-labels, on US:     F0.5 = 0.97684  (-0.00097 vs A)
+ref US-labelled model (in-sample, upper bound): F0.5 = 0.98946
+
+[exited with code 0]
