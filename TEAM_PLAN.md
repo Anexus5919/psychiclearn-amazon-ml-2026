@@ -245,3 +245,197 @@ of the training time and final loss.
 | A teammate's result doesn't beat validation | It isn't used. No harm done. |
 | Run 4 fails on L1 | Run 3's file (LB 0.941) is always kept as a safe fallback |
 | The deadline is near | Stop experiments by **27 Sep 20:00 IST**; final upload and zip by 23:00 |
+
+---
+
+## 7. Next-step plan (added 26 Sep 2026, ~17:00 IST)
+
+> **Appended section.** Sections 0–6 above are unchanged. Background and full metrics are in
+> `JOURNEY.md` §9–§14 and in `results/`. **Current public score: 0.963** (upload #3 = run 4). The
+> leaderboard top is 0.9906.
+
+### 7.1 Where we stand (evidence this plan is based on)
+
+| Measure | Run 3 | **Run 4** | Source |
+|---|---|---|---|
+| Validation F0.5 (OOF, held-out businesses) | 0.9613 | **0.9763** | `results/run4_validation_report.json` |
+| India / US validation | 0.9443 / 0.9726 | **0.9671 / 0.9824** | same |
+| Retrieval ceiling ("oracle") India / US | – | 0.9770 / 0.9941 | same |
+| France (worked out from the leaderboard) | ≈0.85 | **≈0.90** | LB − country-weighted validation |
+| Public leaderboard | 0.941 | **0.963** | Unstop |
+
+Where run 4 still loses points (run-4 validation data; details in `results/run4_error_analysis.md`):
+
+| Loss | India | US |
+|---|---|---|
+| True matches never retrieved | **5.59%** of true pairs (ceiling 0.977) | 1.74% (ceiling 0.994) |
+| …of which the name was near-identical (≥90) and got crowded out by same-named businesses | **75.8%** | **57.9%** |
+| …of which the candidate had an empty address | 19.2% | 45.8% |
+| Gain if every false merge were removed | +0.0035 | +0.0030 |
+| Gain if every retrieved-but-rejected true match were accepted | +0.0064 | +0.0087 |
+
+Weighted by the test mix (India 47%, US 38%, France 15%), the biggest remaining losses are
+**France (~1.4 LB points)** and **India retrieval (~1.1)**. Decision thresholds are worth ~0, because
+our errors are *confident* errors (L2's result, §7.5).
+
+### 7.2 Workstream status at a glance
+
+| # | Workstream | Owner | Status |
+|---|---|---|---|
+| WS1 | Run 5: state-restricted name search + name clean-up + wider e5 coverage + smaller candidate file | L1 | **running** (started 16:32, ETA ~21:00) |
+| WS2 | France pseudo-labelling | L1 | **tested → rejected** (it lowered the score in the offline test) |
+| WS3 | mDeBERTa cross-encoder as a 2nd expert (`ce2`) | L4 → L1 | **L4 training on Kaggle**; L1 integration code ready |
+| WS4 | Decision layer re-tune on run 4 (corrected comparison) | L2 | optional (approved plan item) |
+| WS5 | India missed-match analysis | L1 (was planned for L2) | **done by L1 at 16:30**, results in §7.1 / `results/`. If L2 already started, compare notes; no need to repeat. |
+| WS6 | LightGBM tuning / 2nd GBDT on run-4 features | L3 | optional, low priority (files are posted) |
+| WS7 | Final package: code, README, documentation, zip, last upload | L1 (+ L2 documentation draft, per §1) | 27 Sep |
+
+### 7.3 WS1 — Run 5 (L1)
+
+- **Objective and rationale.** Recover India and US matches lost to *crowding*: generic names such as
+  "Surya Healthcare" or "Apex" exist hundreds of times per country, so a country-wide top-15 name
+  search pushes the right record out. The state (India/US) or region (France) cuts the competition:
+  test S2 records that share their exact name with more than 15 others fall from 24.3% to 7.9%
+  (India) and from 9.5% to 0.7% (US).
+- **Execution steps (automated, `run5_chain.sh`):**
+  1. `--stage regions`: learn a state/region key per record. The S1 vocabulary is label-free; codes
+     like `MH` or `महाराष्ट्र` are learned from training pairs, with query businesses excluded (done:
+     India 15 states, US 45, France 3 regions).
+  2. `--stage pairs`: the existing passes plus the **region pass** (name TF-IDF within the state,
+     k=10), the **exact-name pass for all countries** (cap 50), and a retrieval-only name clean-up
+     (look-alike digits `0→o 1→l …`, `(ID: 12345)` tags).
+  3. `--stage prune`: re-learned pruning rule (≤0.2% recall loss).
+  4. e5 band `[0.005, 0.995]` (was `[0.02, 0.995]`). Run-4 e5 scores are **reused**; only new pairs
+     are scored on the L1 GPU, in parallel with `--stage augment`.
+  5. `--stage augment_ce`, then `--stage train` and `--stage predict`. `candidate_pairs.tsv` keeps
+     pairs with matcher p ≥ 0.0001.
+  6. Official validator with `--check-ids`.
+- **Files and data:** `Downloads\PsychicLearn_work5\` (norm and queries copied from run 4; the same
+  304,555 training businesses, so the numbers are comparable), e5 model `PsychicLearn_work_ce\ce_e5small`.
+- **Commands:** `bash run5_chain.sh`, a copy of which is in `dev_run5/scripts/`. Each stage can be
+  resumed with `python -m ber.pipeline ... --exact-name-cap 50 --k-region 10 --stage <stage>`.
+- **Validation metrics and success criteria:**
+
+  | Check | Must be |
+  |---|---|
+  | Held-out region agreement (true pairs, both known) | measured: India 98.4%, US 93.1% ✅ |
+  | Blocking pair recall (validation) | > 0.9657 (run 4) |
+  | India retrieval ceiling | > 0.977 (run 4) |
+  | **OOF macro F0.5** | **> 0.97628** (run 4), otherwise run 5 is not uploaded |
+  | Candidates per business in `candidate_pairs.tsv` | ≈7 (was 22.6), with candidate-recall loss < 0.01% |
+  | Validator | PASS |
+
+- **Expected outputs:** `Downloads\PsychicLearn_run5_output\{matching_results.tsv, candidate_pairs.tsv}`
+  and `work5\report_train.json`. Expected leaderboard: **≈0.966–0.972** (estimate, not a measurement).
+- **Dependencies:** none (L1 only).
+- **Risks and safeguards:** more candidates means a longer runtime (the new pass only *adds* pairs;
+  it cannot lose matches). US region agreement is 93% (city names shared across states), and the model
+  learns how far to trust `region_match`. Fallback: **run 4 (LB 0.963) stays the best file** until run 5
+  beats it on validation.
+- **Integration:** run 5 becomes the base that WS3 builds on.
+
+### 7.4 WS2 — France pseudo-labelling (L1): tested, **not used**
+
+- **Test (proxy, since France has no labels):** train on India only → predict the US, then add the
+  confident US predictions as extra training labels → predict the US again. Scored against the real
+  US labels (50% sample, run-4 features, `dev_run5/scripts/pl_proxy.py`):
+
+  | Variant | US F0.5 |
+  |---|---|
+  | A: India-only model | **0.97782** |
+  | B: + pseudo-labels (p ≥ 0.95 / ≤ 0.02; 99.74% of positives correct) | 0.97667 (−0.0012) |
+  | C: + pseudo-labels (p ≥ 0.90 / ≤ 0.05) | 0.97684 (−0.0010) |
+
+- **Decision:** pseudo-labelling **lowers** the score, even with 99.7%-correct labels, because the
+  model mostly re-learns examples it already gets right. It is dropped from run 5 and later runs.
+- **Side finding:** an India-only model already scores 0.978 on the US, so the model transfers well
+  between countries. France's ≈0.90 is more likely caused by France's **extremely generic names**
+  (19.5% of French records share their exact name with more than 15 others; 12.7% even within a
+  region) than by the language.
+
+### 7.5 WS3 — mDeBERTa second expert (L4 → L1)
+
+- **Objective:** a stronger multilingual cross-encoder as a 2nd opinion next to e5 (e5 alone gave
+  +1.5 validation points in run 4).
+- **Steps (L4):** follow `kaggle/KAGGLE_GUIDE_L4.md`, which is one Kaggle run that trains, then scores
+  `score_train.parquet` + `score_test.parquet` (run-4 band, 15.2M pairs).
+- **Files:** inputs in release `from-L1`; outputs `ce2_train.parquet` / `ce2_test.parquet`
+  (`s1_id, cand_id, ce_p`) go to release `from-L4`.
+- **Commands (L1, after download):** copy the files to `work5\ce2\train.parquet` / `test.parquet`, then
+  `python -m ber.pipeline ... --stage augment_ce --ce-dir <work5\ce2> --ce-prefix ce2`, then
+  `--stage train` and `--stage predict`.
+- **Success criterion:** OOF F0.5 gain **≥ +0.0005** over run 5 without `ce2`.
+- **Expected output:** run 6 files and an upload if the criterion is met.
+- **Dependencies:** L4's Kaggle run (≈2.5–5 h); run 5 finished.
+- **Risks and safeguards:** L4's scores cover the **run-4** band only. Run-5 pairs outside it get
+  `NaN` for `ce2_*`. The same rule applies to train and test, so it's consistent, and LightGBM handles
+  NaN natively. If Kaggle fails, run 5 (e5 only) stands.
+- **Integration:** extra feature columns `ce2_p, ce2_rank, ce2_gap, ce2_n50`, picked up automatically
+  by the main model.
+
+### 7.6 WS4 — Decision layer re-tune on run 4 (L2, optional)
+
+- **Result so far (run 3):** per-source thresholds S2 0.66 / S3 0.70 + t3 0.76 for rank ≥ 3 gave
+  held-out 0.961311 versus a baseline of 0.961270 (**+0.00004**, which is noise). The comparison used the
+  full-data baseline, not the old rule **on the same held-out half**, so the true gain is unknown. PR #1
+  is **not merged**.
+- **Steps:**
+  1. Download `run4_oof.parquet` + `run4_truth.parquet` (release `from-L1`).
+  2. Build truth sets **with** retrieval misses (`n_true − n_true_found` dummies).
+  3. Check the baseline reproduces **0.97628** (t1 0.54, t2 0.74).
+  4. Tune on folds 0–1 and report **old rule versus new rule on folds 2–3**.
+- **Command:** `python -m ber.decide --oof run4_oof.parquet --truth run4_truth.parquet --params-out
+  decision_params.json --report-out l2_report.txt` (the L2 branch CLI).
+- **Success criterion:** held-out gain **≥ +0.0005** over the old rule on the same half. Otherwise the
+  current rule stays.
+- **Output:** `decision_params.json` + report on branch `feat/decision`.
+- **Integration:** L1 swaps `decide()` for `decide_v2(params)` in the predict stage only if the
+  criterion is met.
+
+### 7.7 WS6 — GBDT tuning (L3, optional, low priority)
+
+- **Why low priority:** the model is bimodal (L2's run-3 analysis: 80% of pairs p < 0.1, 18% p > 0.85), so parameter tuning
+  typically moves F0.5 by only tenths of a point.
+- **Inputs:** `run4_train_features.parquet` + `features_run4.json` (release `from-L1`), with the same
+  folds (`fold` column).
+- **Success criterion:** OOF log-loss improves **and** F0.5 improves ≥ +0.0005 with the unchanged
+  decision rule.
+- **Integration:** L1 retrains with the new params in the final run, only if the criterion is met.
+
+### 7.8 WS7 — Final package and uploads (27 Sep)
+
+| Step | Owner | Detail |
+|---|---|---|
+| Code into `submission/code/business_entity_resolution/` | L1 | best validated version (run 5/6), unit tests passing |
+| **README fix** | L1 | remove "no pretrained models" and "CPU only". State: e5-small (MIT, 118M) and mDeBERTa-v3-base (MIT, 280M) if used; GPU/Kaggle for the cross-encoders |
+| `Documentation_template.md` | L2 draft → L1 final | from `JOURNEY.md`; honest limits (France zero-shot, pseudo-labelling rejected, estimates marked as estimates) |
+| `PsychicLearn_submission.zip` | L1 | exact required structure, no `__MACOSX`/`.DS_Store`, both TSVs LF-only |
+| Last leaderboard upload | L1 | **must be the best-validated file**; experiments stop at **27 Sep 20:00 IST** |
+
+### 7.9 Timeline and upload plan
+
+| Time (IST) | Event | Upload |
+|---|---|---|
+| 26 Sep ~21:00 | run 5 done → validation check | #4 today, if OOF > 0.97628 |
+| 26 Sep night | L4's `ce2` arrives → run 6 = run 5 + mDeBERTa | #5 (today or tomorrow), if OOF gain ≥ +0.0005 |
+| 27 Sep day | optional L2/L3 merges; final package | final upload = best-validated |
+| 27 Sep 20:00 | stop all experiments | – |
+| 27 Sep 23:00 | zip + final upload done (1 h buffer before the deadline) | – |
+
+### 7.10 Risks, safeguards and fallbacks (all workstreams)
+
+| Risk | Safeguard / fallback |
+|---|---|
+| A change lowers the score | Nothing is uploaded unless it beats validation; the best file so far (run 4, 0.963) is always kept |
+| Laptop sleeps or VS Code closes during a run | Keep L1 plugged in and awake; every stage resumes from its last finished partition |
+| RAM pressure on L1 (16 GB) | Stages stream from disk; parallel jobs kept small; close unneeded apps |
+| Kaggle quota or errors | Run 5 does not depend on Kaggle; L4's result is optional |
+| Overclaiming in the documentation | Every number comes from a file in `results/`; estimates are labelled as estimates |
+
+### 7.11 How results enter the final pipeline
+
+Only L1 merges, and only through code on `main` plus the pipeline's own validation:
+
+1. Each ingredient must show **old vs new F0.5 on the same held-out businesses**, gain ≥ +0.0005.
+2. L1 re-runs `train` + `predict` with the ingredient and checks OOF F0.5 and the validator.
+3. The upload happens only if the OOF beats the best so far. The last upload is always the best-validated file.
