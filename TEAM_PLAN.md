@@ -114,8 +114,12 @@ match ≥ t1 + later matches ≥ t2". The error analysis showed that **missed ma
      top-k (k = 0…m) that maximises the expected F0.5, treating each candidate as correct with probability
      `p` (Monte-Carlo or exact enumeration for small m), plus the expected number of retrieval misses;
    - **(d)** the probability-sum rule: `k ≈ round(sum(p))`, capped by thresholds.
-3. Guard against overfitting: tune on half of the businesses (e.g. `hash(s1_id) % 2 == 0`) and report the
-   score on the other half.
+3. Guard against overfitting: tune on half of the businesses and report the score on the other half.
+   Use the `fold` column for the split (`fold in (0, 1)` = tune, `fold in (2, 3)` = held out). **Don't use
+   Python's `hash()`**: it is randomised per process for strings, so the split changes on every run.
+4. **Truth sets must include retrieval misses.** For every business in `run3_truth`, the true set is
+   {candidates with `label == 1`} plus `n_true - n_true_found` dummy IDs. Otherwise the missed matches are
+   not counted as false negatives, and the scores come out too high.
 
 **Output** (release `from-L2` + branch `feat/decision`):
 - `decide.py` with a new function `decide_v2(df, params)`; unit tests keep passing;
