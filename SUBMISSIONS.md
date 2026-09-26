@@ -19,6 +19,7 @@ Only the team leader uploads, with the files sent as-is. Every file passed the o
 | 2 | 26 Sep 02:50 | Run 3 | 0.9613 (0.9443 / 0.9726) | **0.941** | `3c1bc8120565cf13ac777c9a1c294739a9b21edbf6661b2eb09e8207ebae127f` | `results/run3_matching_results_LB0.941.tsv.gz` | `dev_run3/` | `sub2-run3-LB0.941` |
 | 3 | 26 Sep 15:44 | Run 4 | 0.97628 (0.96710 / 0.98240) | **0.963** | `fa6be7823bbcdacd2c3aa01552cfeedb4897fe90df3ce8d9bae861d9ce790034` | `results/run4_matching_results_LB0.963.tsv.gz` | `dev_run4/` | `sub3-run4-LB0.963` |
 | 4 | 26 Sep 23:45 | Run 5 | 0.97789 (0.96906 / 0.98378) | **0.967** | `e901975dd43178d1b5ae836c0d44bd2d64add672dd798fd2eb162fe27aea9a5e` | `results/run5_matching_results_LB0.967.tsv.gz` | `dev_run5/` | `sub4-run5-LB0.967` |
+| 5 | 27 Sep 03:18 | Run 6 | 0.98769 (0.98772 / 0.98767) | **0.983** | `3f1e43a2b5cc52f7354efbd83efd47ed9b4049b82600a5465d8586cf85512e0c` | `results/run6_matching_results_LB0.983.tsv.gz` | `dev_run6/` | `sub5-run6-LB0.983` |
 
 ## What changed in each submission
 
@@ -27,6 +28,7 @@ Only the team leader uploads, with the files sent as-is. Every file passed the o
 | 1 | Baseline pipeline: normalisation → TF-IDF retrieval (name / address / combined) → ~50 features → LightGBM (4-fold grouped CV) → exclusive assignment + rank thresholds | `JOURNEY.md` §4–5 |
 | 2 | + learned Indic→Latin transliteration (India); + learned candidate pruning (54 → 18 candidates per business) | `JOURNEY.md` §5; `results/run3_*` |
 | 3 | + fine-tuned cross-encoder `intfloat/multilingual-e5-small` (MIT, 118M) as a stacked feature; bigger India retrieval + exact-name pass; 304,555 training businesses; 16 new features | `JOURNEY.md` §9; `results/run4_*` |
+| 5 | + **dense retrieval** (fine-tuned `multilingual-e5-small` bi-encoder, top-15 neighbours, trained by L2 on Kaggle with validation businesses excluded) as a search pass + `rank_dense`/`cos_dense` features; + **2nd cross-encoder** `microsoft/mdeberta-v3-base` (MIT, 280M; L4, Kaggle) as `ce2_*` features. Retrieval recall 0.9688 → 0.9955; 8.3 candidates per business after pruning | `results/run6_*`, `kaggle/dense_retrieval.py`, `kaggle/mdeberta_cross_encoder.py` |
 | 4 | + state/region-restricted name retrieval (`ber/regions.py`); exact-name pass for all countries; look-alike-digit / ID-tag name clean-up; wider e5 band; `candidate_pairs.tsv` trimmed to matcher p ≥ 0.0001 (22.6 → ~7 candidates per business) | `JOURNEY.md` §13; `results/run5_*` |
 
 ## How the exact code was pinned
@@ -37,8 +39,7 @@ Only the team leader uploads, with the files sent as-is. Every file passed the o
   exists; it did not exist during run 5. The reconstruction was checked by applying the run-6 patch
   (`dev_run6/scripts/patch_run6.py`) to it: the result is identical, file for file, to the live code
   that run 6 uses.
-- `dev_run6/` is the code of the next run: dense-retrieval pass + second cross-encoder. It is not
-  submitted yet.
+- `dev_run6/` is the exact run-6 code (verified identical to the live code that produced submission 5).
 
 ## Verify a file
 
