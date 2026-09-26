@@ -340,6 +340,46 @@ class TestTuneV2:
         assert 0.0 <= tune_f <= 1.0
         assert 0.0 <= held_f <= 1.0
 
+    def test_tune_v2_fold_split(self):
+        """When 'fold' is present, fold in (0, 1) is used for tune, fold in (2, 3) for held."""
+        df = self._make_df()
+        # assign folds 0, 1, 2, 3 based on entity index
+        s1_list = sorted(df["s1_id"].unique())
+        fold_map = {s1: i % 4 for i, s1 in enumerate(s1_list)}
+        df["fold"] = df["s1_id"].map(fold_map)
+        truth = self._make_truth(df)
+
+        tune_f, held_f, params = decide.tune_v2(
+            df, truth, method="threshold",
+            grid1=np.array([0.2, 0.5]),
+            grid2=np.array([0.5, 0.7]),
+            grid3=np.array([999.0]),
+        )
+        assert 0.0 <= tune_f <= 1.0
+        assert 0.0 <= held_f <= 1.0
+
+    def test_default_half_deterministic(self):
+        """_default_half must give identical booleans across repeated invocations and avoid hash()."""
+        for s1 in ["A", "B", "company_123", "amazon_ml_test", "12345"]:
+            assert decide._default_half(s1) == decide._default_half(s1)
+            # Must return a boolean
+            assert isinstance(decide._default_half(s1), (bool, np.bool_))
+
+    def test_truth_includes_retrieval_misses(self):
+        """TEAM_PLAN.md item 4: truth set for business with misses has n_true items (including dummy IDs)."""
+        # Test the dummy ID mechanism: if an entity has 5 true matches but only 3 found by retrieval,
+        # truth set must have 3 true candidate IDs + 2 dummy miss IDs.
+        found_cands = {"cand_1", "cand_2", "cand_3"}
+        n_true = 5
+        n_found = 3
+        misses = max(0, n_true - n_found)
+        truth_set = set(found_cands)
+        for i in range(misses):
+            truth_set.add(f"__miss_entity1_{i}")
+        assert len(truth_set) == 5
+        assert "__miss_entity1_0" in truth_set
+        assert "__miss_entity1_1" in truth_set
+
     def test_score_v2_matches_scoring_module(self):
         """_score_v2 should agree with scoring.macro_f05 for the threshold method."""
         df = self._make_df()

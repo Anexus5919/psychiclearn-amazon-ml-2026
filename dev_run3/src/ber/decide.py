@@ -11,6 +11,7 @@ L2 additions (feat/decision):
    drop in the best params from decision_params.json without touching any other code.
 4. tune_v2: half-business cross-validated tuning that prevents leakage.
 """
+import hashlib
 import itertools
 
 import numpy as np
@@ -258,7 +259,10 @@ def _decide_prob_sum(d, params):
 #                Default: hash(s1_id) % 2 == 0 (stable, deterministic split).
 
 def _default_half(s1_id):
-    return hash(s1_id) % 2 == 0
+    """Deterministic, process-independent half split using MD5.
+    Never uses Python's randomised hash() which changes per process.
+    """
+    return int(hashlib.md5(str(s1_id).encode("utf-8")).hexdigest(), 16) % 2 == 0
 
 
 def tune_v2(df, truth, method="threshold", exclusive=True, half_selector=None,
@@ -267,23 +271,39 @@ def tune_v2(df, truth, method="threshold", exclusive=True, half_selector=None,
 
     Parameters
     ----------
-    df : DataFrame with columns s1_id, cand_id, src, p, label
+    df : DataFrame with columns s1_id, cand_id, src, p, label (and optional 'fold')
     truth : dict {s1_id: set of true cand_ids} for all validation businesses
     method : "threshold" | "expected_f05" | "prob_sum"
     exclusive : bool
-    half_selector : callable(s1_id) -> bool; True = tune half
+    half_selector : callable(s1_id) -> bool; True = tune half (fallback if 'fold' column absent)
     grid1, grid2, grid3 : np arrays of threshold values to sweep
 
     Returns
     -------
     (tune_f05, held_f05, best_params)
     """
-    if half_selector is None:
-        half_selector = _default_half
-
-    all_s1 = list(truth.keys())
-    tune_ids = set(s1 for s1 in all_s1 if half_selector(s1))
-    held_ids = set(s1 for s1 in all_s1 if not half_selector(s1))
+    if "fold" in df.columns:
+        # Use fold column per TEAM_PLAN.md: fold in (0, 1) = tune, fold in (2, 3) = held
+        tune_s1 = set(df[df["fold"].isin([0, 1])]["s1_id"].unique())
+        held_s1 = set(df[df["fold"].isin([2, 3])]["s1_id"].unique())
+        selector = half_selector if half_selector is not None else _default_half
+        tune_ids = set()
+        held_ids = set()
+        for s1 in truth.keys():
+            if s1 in tune_s1:
+                tune_ids.add(s1)
+            elif s1 in held_s1:
+                held_ids.add(s1)
+            else:
+                if selector(s1):
+                    tune_ids.add(s1)
+                else:
+                    held_ids.add(s1)
+    else:
+        selector = half_selector if half_selector is not None else _default_half
+        all_s1 = list(truth.keys())
+        tune_ids = set(s1 for s1 in all_s1 if selector(s1))
+        held_ids = set(s1 for s1 in all_s1 if not selector(s1))
 
     df_tune = df[df["s1_id"].isin(tune_ids)]
     df_held = df[df["s1_id"].isin(held_ids)]
@@ -471,28 +491,27 @@ def run_full_tune(oof_path, truth_path, out_params_path, out_report_path,
     truth_df = pd.read_parquet(truth_path)
 
     # Build truth dict: {s1_id: set_of_true_cand_ids}
-    # truth_df gives n_true/n_true_found per entity; for scoring we need the actual cand_ids.
-    # The label column in oof identifies true pairs, so we reconstruct from there.
-    truth_map = (oof[oof["label"] == 1]
-                 .groupby("s1_id")["cand_id"]
-                 .apply(set)
-                 .to_dict())
-    # Include entities with 0 true matches (singletons): must appear in truth_map as empty set
-    for s1_id in oof["s1_id"].unique():
-        if s1_id not in truth_map:
-            truth_map[s1_id] = set()
-    # Also add entities from truth_df that have no candidates at all (blocking misses)
-    # These need to be included so their 0-prediction is scored correctly
-    for s1_id in truth_df["s1_id"].unique():
-        if s1_id not in truth_map:
-            # n_true > 0 means they have true matches but none were retrieved
-            row = truth_df[truth_df["s1_id"] == s1_id].iloc[0]
-            if row["n_true"] > 0:
-                # We don't know the actual cand_ids, but n_true > 0 means empty pred = 0
-                # Use a dummy set of the right size to correctly penalise misses
-                truth_map[s1_id] = {f"__miss_{s1_id}_{i}" for i in range(int(row["n_true"]))}
-            else:
-                truth_map[s1_id] = set()
+    # Per TEAM_PLAN.md: for every business in run3_truth, the true set is {candidates with label == 1}
+    # plus n_true - n_true_found dummy IDs so that missed matches count as false negatives.
+    found_true = (oof[oof["label"] == 1]
+                  .groupby("s1_id")["cand_id"]
+                  .apply(set)
+                  .to_dict())
+
+    truth_records = truth_df.set_index("s1_id").to_dict(orient="index") if "s1_id" in truth_df.columns else {}
+    all_s1_ids = set(truth_records.keys()) | set(oof["s1_id"].unique())
+
+    truth_map = {}
+    for s1_id in all_s1_ids:
+        cands = set(found_true.get(s1_id, set()))
+        if s1_id in truth_records:
+            rec = truth_records[s1_id]
+            n_true = int(rec.get("n_true", len(cands)))
+            n_found = int(rec.get("n_true_found", len(cands)))
+            misses = max(0, n_true - n_found)
+            for i in range(misses):
+                cands.add(f"__miss_{s1_id}_{i}")
+        truth_map[s1_id] = cands
 
     # Baseline: v1 tune
     print("Computing baseline (v1) …")
@@ -555,7 +574,7 @@ def run_full_tune(oof_path, truth_path, out_params_path, out_report_path,
         json.dumps(best_params, indent=2),
         "",
         "## Interpretation",
-        "  Tune half = hash(s1_id) % 2 == 0 (deterministic, no leakage).",
+        "  Tune half = fold in (0, 1) if fold column present, else deterministic MD5 split (no leakage).",
         "  Held-out F0.5 is the honest estimate of leaderboard gain.",
         "  Params written to decision_params.json for use by L1 in run 5.",
     ]
