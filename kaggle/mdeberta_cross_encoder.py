@@ -3,7 +3,7 @@
 # Inputs (attach via "Add Data"; found anywhere under /kaggle/input):
 #   ce_train.parquet   (text_a, text_b, label)                                  - phase 1 (training)
 #   score_train.parquet, score_test.parquet (s1_id, cand_id, text_a, text_b)     - scored if present
-#   mdeberta_ce/ (a trained model, e.g. phase-1 notebook output)                - if present: SCORE-ONLY, no training
+#   mdeberta_ce/ or ce_model/ (a trained model, e.g. phase-1 notebook output)   - if present: SCORE-ONLY, no training
 # Output (/kaggle/working): mdeberta_ce/ (model), ce2_train.parquet / ce2_test.parquet (s1_id, cand_id, ce_p)
 # Model licence: microsoft/mdeberta-v3-base is MIT (allowed: MIT/Apache, <= 8B params).
 import glob, os, time
@@ -28,7 +28,6 @@ def find(rel):
 
 os.makedirs(OUT, exist_ok=True)
 print("GPUs:", torch.cuda.device_count(), [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())])
-tok = AutoTokenizer.from_pretrained(MODEL)
 
 
 class Pairs(Dataset):
@@ -48,7 +47,7 @@ class Pairs(Dataset):
 
 # Phase 2 (score-only): if an already-trained model is attached as input (a folder "mdeberta_ce" with
 # config.json, e.g. the output of the phase-1 notebook added as a dataset), skip training entirely.
-trained = find("mdeberta_ce/config.json")
+trained = find("mdeberta_ce/config.json") or find("ce_model/config.json")
 t0 = time.time()
 if trained:
     MODEL_DIR = os.path.dirname(trained)
@@ -56,7 +55,8 @@ if trained:
     tok = AutoTokenizer.from_pretrained(MODEL_DIR)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_DIR)
 else:
-    assert find("ce_train.parquet"), "attach the dataset with ce_train.parquet (or a trained mdeberta_ce/ model)"
+    assert find("ce_train.parquet"), "attach the dataset with ce_train.parquet (or a trained mdeberta_ce/ or ce_model/)"
+    tok = AutoTokenizer.from_pretrained(MODEL)
     tr = pd.read_parquet(find("ce_train.parquet"))
     if SMOKE:
         tr = tr.sample(SMOKE, random_state=0).reset_index(drop=True)
