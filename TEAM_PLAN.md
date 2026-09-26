@@ -164,7 +164,44 @@ adds a few tenths of a point, and averaging two good models is safer than one.
 **Later:** when L1 posts `run4_train_features.parquet` (~ +2–3 h), repeat step 2's confirmation and step 3
 on it. The run-4 features are the ones used in the final run.
 
-### L4: big cross-encoder (GPU / Kaggle, ~3–4 h wall, mostly unattended)
+### L4 (updated 26 Sep, 15:10): documentation + clean-machine check
+
+Adarsh is running the mDeBERTa Kaggle job himself, because his Kaggle was already set up. **L4 does not
+start the Kaggle task.** L4 stays on standby as the Kaggle backup, and takes the two deliverables nobody
+owns yet. Work on branch `docs/l4`.
+
+**Task 1: draft `Documentation_template.md`** (a required part of the final zip; ~2–3 h).
+- Sources: `JOURNEY.md`, `HANDOFF.md`, this plan, `results/run3_validation_report.json`,
+  `results/run3_pruning_rule.json`, and the run-4 code in `dev_run4/src/ber/`.
+- Fill every section of `submission/Documentation_template.md`, and keep its headings.
+- Use run-3 numbers where they exist: OOF 0.9613, LB 0.941, 18 candidates per business, blocking recall
+  0.9595. Wherever the final number is not known yet, write `[FINAL: …]`. Adarsh fills those in at the
+  end.
+- **Honesty rules:**
+  - Every number must come from a file in the repo.
+  - France has no training labels, so it is zero-shot. Say so.
+  - Models used: e5-small (MIT, 118M) and possibly mDeBERTa-v3-base (MIT, 280M). No external data.
+  - Never call rule-based steps "AI".
+- Describe run 4 and run 5 as run 3 plus:
+  - an exact-name retrieval pass and bigger India search;
+  - extra features (`features_extra.py`);
+  - cross-encoder scores as features (`cross_encoder.py`);
+  - more training data.
+
+**Task 2: clean-machine check of the code package** (~1–2 h, mostly waiting).
+- On your laptop, follow **only** `submission/code/business_entity_resolution/README.md`, as a judge
+  would.
+- Use a small subset, not the full data. Get the dataset from the challenge portal, then run
+  `python tests/make_dev_subset.py` (see its `--help`).
+- Report every step that fails or is unclear: missing packages, wrong paths, anything the README
+  doesn't say.
+- **Known issue to confirm:** this README is from run 2. It says "no pretrained models" and "CPU only".
+  Both claims become false once the cross-encoder is added, so list exactly what must change.
+
+**Output:** push to branch `docs/l4` with `Documentation_template.md` (draft) and `repro_notes.md`
+(what failed or was unclear). Don't merge.
+
+### L4 (original plan, now Adarsh's job): big cross-encoder (GPU / Kaggle, ~3–4 h wall, mostly unattended)
 
 **Why.** A fine-tuned multilingual transformer reads both records side by side and learns typos, dropped
 digits, duplicated words and transliteration. Our small model (e5-small) is training on L1 now. The
