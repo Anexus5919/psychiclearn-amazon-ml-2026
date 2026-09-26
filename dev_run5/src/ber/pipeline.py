@@ -578,6 +578,10 @@ def main():
         stage_augment(cfg)
     if a.stage == "augment_ce":
         stage_augment_ce(cfg, a.ce_dir, a.ce_prefix)
+        ce2 = os.path.join(cfg.work_dir, "ce2")  # optional 2nd cross-encoder (mDeBERTa), merged when present
+        if a.ce_prefix == "ce" and all(os.path.exists(os.path.join(ce2, f"{sp}.parquet")) for sp in ("train", "test")):
+            log(f"found {ce2}: merging second cross-encoder scores as ce2_*", cfg)
+            stage_augment_ce(cfg, ce2, "ce2")
     if a.stage in ("train", "all"):
         stage_train(cfg)
     if a.stage in ("predict", "all"):

@@ -1,0 +1,38 @@
+{
+  "top_n": 30,
+  "min_p": 0.001,
+  "recall_loss": 0.0018284535502472998,
+  "per_entity": 17.829712203050352,
+  "frontier": {
+    "0.0005": {
+      "top_n": 30,
+      "min_p": 0.0,
+      "recall_loss": 0.00093,
+      "per_entity": 29.9981
+    },
+    "0.001": {
+      "top_n": 30,
+      "min_p": 0.0,
+      "recall_loss": 0.00093,
+      "per_entity": 29.9981
+    },
+    "0.002": {
+      "top_n": 30,
+      "min_p": 0.001,
+      "recall_loss": 0.00183,
+      "per_entity": 17.82971
+    },
+    "0.005": {
+      "top_n": 20,
+      "min_p": 0.003,
+      "recall_loss": 0.00476,
+      "per_entity": 11.82971
+    },
+    "0.01": {
+      "top_n": 30,
+      "min_p": 0.01,
+      "recall_loss": 0.00992,
+      "per_entity": 8.27581
+    }
+  }
+}
