@@ -1,9 +1,10 @@
 # PsychicLearn - mDeBERTa-v3-base cross-encoder on Kaggle (GPU T4 x2, Internet ON).
 # Paste this whole file into ONE Kaggle notebook cell and run it.
-# Input dataset (attach via "Add Data"): a Kaggle dataset containing
-#   ce_train.parquet   (text_a, text_b, label)            - required
-#   score_train.parquet, score_test.parquet (s1_id, cand_id, text_a, text_b) - optional; scored if present
-# Output (/kaggle/working): mdeberta_ce/ (model), ce_train.parquet / ce_test.parquet (s1_id, cand_id, ce_p)
+# Inputs (attach via "Add Data"; found anywhere under /kaggle/input):
+#   ce_train.parquet   (text_a, text_b, label)                                  - phase 1 (training)
+#   score_train.parquet, score_test.parquet (s1_id, cand_id, text_a, text_b)     - scored if present
+#   mdeberta_ce/ (a trained model, e.g. phase-1 notebook output)                - if present: SCORE-ONLY, no training
+# Output (/kaggle/working): mdeberta_ce/ (model), ce2_train.parquet / ce2_test.parquet (s1_id, cand_id, ce_p)
 # Model licence: microsoft/mdeberta-v3-base is MIT (allowed: MIT/Apache, <= 8B params).
 import glob, os, time
 import numpy as np, pandas as pd, torch
@@ -11,10 +12,20 @@ from torch.utils.data import Dataset
 from transformers import (AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding,
                           Trainer, TrainingArguments)
 
+SMOKE = 0  # set to 3000 for a ~3-minute test run (tiny sample); MUST be 0 for the real run
 MODEL, MAX_LEN = os.environ.get("BER_MODEL", "microsoft/mdeberta-v3-base"), 96
-# Kaggle: files come from the attached dataset. Local GPU: set BER_IN / BER_OUT to folders.
-IN = os.environ.get("BER_IN") or sorted(glob.glob("/kaggle/input/*/ce_train.parquet"))[0].rsplit("/", 1)[0]
-OUT = os.environ.get("BER_OUT", "/kaggle/working")
+# Kaggle: files come from the attached inputs. Local GPU: set BER_IN / BER_OUT to folders.
+IN, OUT = os.environ.get("BER_IN"), os.environ.get("BER_OUT", "/kaggle/working")
+
+
+def find(rel):
+    """Path of an input file/folder: BER_IN if set, else searched anywhere under /kaggle/input."""
+    if IN:
+        return os.path.join(IN, rel) if os.path.exists(os.path.join(IN, rel)) else None
+    hits = sorted(glob.glob(f"/kaggle/input/**/{rel}", recursive=True))
+    return hits[0] if hits else None
+
+
 os.makedirs(OUT, exist_ok=True)
 print("GPUs:", torch.cuda.device_count(), [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())])
 tok = AutoTokenizer.from_pretrained(MODEL)
@@ -35,12 +46,24 @@ class Pairs(Dataset):
         return item
 
 
-tr = pd.read_parquet(f"{IN}/ce_train.parquet")
-print(f"train pairs: {len(tr):,}  positives: {tr['label'].mean():.3f}")
+# Phase 2 (score-only): if an already-trained model is attached as input (a folder "mdeberta_ce" with
+# config.json, e.g. the output of the phase-1 notebook added as a dataset), skip training entirely.
+trained = find("mdeberta_ce/config.json")
 t0 = time.time()
-ds = Pairs(tr["text_a"], tr["text_b"], tr["label"].values)
-print(f"tokenised in {time.time() - t0:.0f}s")
-model = AutoModelForSequenceClassification.from_pretrained(MODEL, num_labels=1, problem_type="regression")
+if trained:
+    MODEL_DIR = os.path.dirname(trained)
+    print("SCORE-ONLY mode: using trained model at", MODEL_DIR)
+    tok = AutoTokenizer.from_pretrained(MODEL_DIR)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_DIR)
+else:
+    assert find("ce_train.parquet"), "attach the dataset with ce_train.parquet (or a trained mdeberta_ce/ model)"
+    tr = pd.read_parquet(find("ce_train.parquet"))
+    if SMOKE:
+        tr = tr.sample(SMOKE, random_state=0).reset_index(drop=True)
+    print(f"train pairs: {len(tr):,}  positives: {tr['label'].mean():.3f}")
+    ds = Pairs(tr["text_a"], tr["text_b"], tr["label"].values)
+    print(f"tokenised in {time.time() - t0:.0f}s")
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL, num_labels=1, problem_type="regression")
 
 
 class BCETrainer(Trainer):
@@ -51,13 +74,14 @@ class BCETrainer(Trainer):
         return (loss, out) if return_outputs else loss
 
 
-args = TrainingArguments(output_dir=f"{OUT}/ckpt", per_device_train_batch_size=64, learning_rate=3e-5,
-                         num_train_epochs=1, warmup_ratio=0.05, weight_decay=0.01, fp16=True, logging_steps=500,
-                         save_strategy="no", report_to=[], dataloader_num_workers=2, max_grad_norm=1.0)
-BCETrainer(model=model, args=args, train_dataset=ds, data_collator=DataCollatorWithPadding(tok)).train()
-model.save_pretrained(f"{OUT}/mdeberta_ce")
-tok.save_pretrained(f"{OUT}/mdeberta_ce")
-print(f"training done in {(time.time() - t0) / 60:.0f} min")
+if not trained:  # phase 1: fine-tune and save the model (phase 2 reuses it as an input dataset)
+    args = TrainingArguments(output_dir=f"{OUT}/ckpt", per_device_train_batch_size=64, learning_rate=3e-5,
+                             num_train_epochs=1, warmup_ratio=0.05, weight_decay=0.01, fp16=True, logging_steps=500,
+                             save_strategy="no", report_to=[], dataloader_num_workers=2, max_grad_norm=1.0)
+    BCETrainer(model=model, args=args, train_dataset=ds, data_collator=DataCollatorWithPadding(tok)).train()
+    model.save_pretrained(f"{OUT}/mdeberta_ce")
+    tok.save_pretrained(f"{OUT}/mdeberta_ce")
+    print(f"training done in {(time.time() - t0) / 60:.0f} min")
 
 
 @torch.no_grad()
@@ -77,11 +101,13 @@ def score(df, batch=512):
 
 
 for split in ("train", "test"):
-    f = f"{IN}/score_{split}.parquet"
-    if os.path.exists(f):
+    f = find(f"score_{split}.parquet")
+    if f:
         df = pd.read_parquet(f)
+        if SMOKE:
+            df = df.head(SMOKE)
         t1 = time.time()
         df["ce_p"] = score(df)
-        df[["s1_id", "cand_id", "ce_p"]].to_parquet(f"{OUT}/ce_{split}.parquet", index=False)
+        df[["s1_id", "cand_id", "ce_p"]].to_parquet(f"{OUT}/ce2_{split}.parquet", index=False)
         print(f"scored {split}: {len(df):,} pairs in {(time.time() - t1) / 60:.0f} min")
-print("ALL DONE")
+print("ALL DONE" + ("  (SMOKE TEST - outputs are NOT usable; set SMOKE = 0 for the real run)" if SMOKE else ""))

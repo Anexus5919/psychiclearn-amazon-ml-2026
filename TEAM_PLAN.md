@@ -177,16 +177,14 @@ digits, duplicated words and transliteration. Our small model (e5-small) is trai
   set BER_OUT=C:\path\to\out
   python kaggle/mdeberta_cross_encoder.py
   ```
-- **Kaggle:**
-  1. kaggle.com → Create → New Dataset → upload `ce_train.parquet` (and the score files when available) → name it `psychiclearn-ce`.
-  2. New Notebook → Settings: **Accelerator = GPU T4 ×2**, **Internet = On** → Add Data → your dataset.
-  3. Paste the script into one cell → **Save Version → "Save & Run All (Commit)"**. It runs in the background; you can close the tab.
-  4. When it finishes: open the version → Output → download `ce_train.parquet`, `ce_test.parquet` (the scores).
+- **Kaggle:** follow the step-by-step guide `kaggle/KAGGLE_GUIDE_L4.md`. It covers setup, a 5-minute smoke
+  test, the training run, the score-only run and troubleshooting.
 
 **Phases:**
-- **Now:** train on `ce_train.parquet` (~1–1.5 h on 2×T4). The script saves the model to `mdeberta_ce/`.
-  Keep it: add the notebook output as a dataset so phase 2 can reuse it without retraining.
-- **When L1 posts the score files:** score them (~1 h).
+- **Now:** train on `ce_train.parquet` (estimate 1–2 h on 2×T4). The script saves the model to `mdeberta_ce/`.
+- **When L1 posts the score files:** attach the phase-1 notebook output as an input. The script sees
+  `mdeberta_ce/`, switches to SCORE-ONLY mode and writes `ce2_train.parquet` / `ce2_test.parquet`
+  (estimate 0.5–1 h).
 
 **Output** (`from_L4/`): `ce2_train.parquet` and `ce2_test.parquet` (`s1_id, cand_id, ce_p`), plus a note
 of the training time and final loss.
