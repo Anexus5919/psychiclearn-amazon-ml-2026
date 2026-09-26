@@ -191,7 +191,7 @@ digits, duplicated words and transliteration. Our small model (e5-small) is trai
 - **Now:** train on `ce_train.parquet` (estimate 1–2 h on 2×T4). The script saves the model to `mdeberta_ce/`.
 - **When L1 posts the score files:** attach the phase-1 notebook output as an input. The script sees
   `mdeberta_ce/`, switches to SCORE-ONLY mode and writes `ce2_train.parquet` / `ce2_test.parquet`
-  (estimate 0.5–1 h).
+  (estimate 1.5–3 h: 15.2M pairs).
 
 **Output** (release `from-L4`): `ce2_train.parquet` and `ce2_test.parquet` (`s1_id, cand_id, ce_p`), plus a note
 of the training time and final loss.

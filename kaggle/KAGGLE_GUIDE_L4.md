@@ -14,7 +14,7 @@ Kaggle gives two T4 GPUs (16 GB each) for free, and the job keeps running after 
 | Phase | When | Kaggle runtime (estimate) |
 |---|---|---|
 | 1. Train | as soon as `ce_train.parquet` is in release `from-L1` | about 1-2 h |
-| 2. Score | when `score_train.parquet` + `score_test.parquet` appear in release `from-L1` | about 0.5-1 h |
+| 2. Score | now: `score_train.parquet` (90 MB, 1.9M pairs) + `score_test.parquet` (576 MB, 13.3M pairs) are in release `from-L1` | about 1.5-3 h |
 
 The runtimes are estimates, because this model has never been run on a T4. The log shows the real ETA.
 
