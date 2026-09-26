@@ -11,8 +11,8 @@ L2 additions (feat/decision):
    drop in the best params from decision_params.json without touching any other code.
 4. tune_v2: half-business cross-validated tuning that prevents leakage.
 """
-import hashlib
 import itertools
+import zlib
 
 import numpy as np
 
@@ -221,33 +221,20 @@ def _decide_expected_f05(d, df_orig, params):
 
 def _decide_prob_sum(d, params):
     """Accept round(sum(p)) candidates per entity, with rank-1 and minimum-p guards."""
+    if len(d) == 0:
+        return {}
     ps_t1 = float(params.get("ps_t1", 0.02))
     ps_tmin = float(params.get("ps_tmin", 0.10))
     ps_cap = int(params.get("ps_cap", 30))
 
-    result = {}
-    for s1_id, grp in d.groupby("s1_id"):
-        probs = grp["p"].values          # sorted desc
-        cands = grp["cand_id"].values
-        rank = grp["rank"].values
+    sum_p = d.groupby("s1_id")["p"].transform("sum").values
+    k_target = np.clip(np.round(sum_p), 1, ps_cap)
+    rank1_p = d.groupby("s1_id")["p"].transform("first").values
+    rank = d["rank"].values
+    p = d["p"].values
 
-        # rank-1 gate: if the best candidate is below ps_t1, skip entirely
-        if len(probs) == 0 or probs[0] < ps_t1:
-            continue
-
-        # target k = round(sum(p)), capped
-        k_target = int(round(float(probs.sum())))
-        k_target = max(1, min(k_target, ps_cap, len(probs)))
-
-        # apply minimum-p filter (can only reduce k, never below 1 if rank-1 passed)
-        mask = probs >= ps_tmin
-        mask[0] = True  # rank-1 already passed gate above
-        # count how many of the top-k_target pass the minimum-p filter
-        k_actual = int(mask[:k_target].sum())
-        k_actual = max(1, k_actual)
-
-        result[s1_id] = list(cands[:k_actual])
-    return result
+    keep = (rank1_p >= ps_t1) & (rank <= k_target) & ((p >= ps_tmin) | (rank == 1))
+    return d[keep].groupby("s1_id")["cand_id"].apply(list).to_dict()
 
 
 # ================================================================== L2: tune_v2
@@ -256,13 +243,13 @@ def _decide_prob_sum(d, params):
 # held_half, to prevent overfitting to the tuning set.
 #
 # half_selector: a callable (s1_id -> bool) where True = tune half.
-#                Default: hash(s1_id) % 2 == 0 (stable, deterministic split).
+#                Default: zlib.crc32(s1_id) % 2 == 0 (stable, deterministic split).
 
 def _default_half(s1_id):
-    """Deterministic, process-independent half split using MD5.
+    """Deterministic, process-independent half split using zlib.crc32.
     Never uses Python's randomised hash() which changes per process.
     """
-    return int(hashlib.md5(str(s1_id).encode("utf-8")).hexdigest(), 16) % 2 == 0
+    return (zlib.crc32(str(s1_id).encode("utf-8")) % 2) == 0
 
 
 def tune_v2(df, truth, method="threshold", exclusive=True, half_selector=None,
@@ -282,28 +269,16 @@ def tune_v2(df, truth, method="threshold", exclusive=True, half_selector=None,
     -------
     (tune_f05, held_f05, best_params)
     """
-    if "fold" in df.columns:
-        # Use fold column per TEAM_PLAN.md: fold in (0, 1) = tune, fold in (2, 3) = held
-        tune_s1 = set(df[df["fold"].isin([0, 1])]["s1_id"].unique())
-        held_s1 = set(df[df["fold"].isin([2, 3])]["s1_id"].unique())
-        selector = half_selector if half_selector is not None else _default_half
-        tune_ids = set()
-        held_ids = set()
-        for s1 in truth.keys():
-            if s1 in tune_s1:
-                tune_ids.add(s1)
-            elif s1 in held_s1:
-                held_ids.add(s1)
-            else:
-                if selector(s1):
-                    tune_ids.add(s1)
-                else:
-                    held_ids.add(s1)
+    if half_selector is not None:
+        tune_ids = set(s1 for s1 in truth.keys() if half_selector(s1))
+        held_ids = set(truth.keys()) - tune_ids
+    elif "fold" in df.columns:
+        # folds 0, 1 = tune; 2, 3 = held out
+        tune_ids = set(df.loc[df["fold"] <= 1, "s1_id"])
+        held_ids = set(truth.keys()) - tune_ids
     else:
-        selector = half_selector if half_selector is not None else _default_half
-        all_s1 = list(truth.keys())
-        tune_ids = set(s1 for s1 in all_s1 if selector(s1))
-        held_ids = set(s1 for s1 in all_s1 if not selector(s1))
+        tune_ids = set(s1 for s1 in truth.keys() if _default_half(s1))
+        held_ids = set(truth.keys()) - tune_ids
 
     df_tune = df[df["s1_id"].isin(tune_ids)]
     df_held = df[df["s1_id"].isin(held_ids)]
@@ -350,12 +325,15 @@ def _score_v2(df, truth, params):
 # ------------------------------------------------------------------ threshold tuner (v2)
 
 def _tune_threshold_v2(df, truth, exclusive, grid1, grid2, grid3):
-    """Grid-search per-source t1/t2 and optional t3 on the tune half."""
+    """Coordinate search per TEAM_PLAN.md §2(a):
+    1. Joint sweep across all sources (t1, t2).
+    2. Coordinate search on S3 thresholds (t1_s3, t2_s3).
+    3. Coordinate search on S2 thresholds (t1_s2, t2_s2).
+    4. Coordinate search on t3 (rank >= 3).
+    """
     grid1 = grid1 if grid1 is not None else np.round(np.arange(0.02, 0.96, 0.04), 3)
     grid2 = grid2 if grid2 is not None else np.round(np.arange(0.10, 0.99, 0.04), 3)
-    # t3 grid: either None (disabled) or a coarse sweep
-    grid3 = grid3 if grid3 is not None else np.concatenate([[999.0],  # 999 = disabled
-                                                             np.round(np.arange(0.40, 0.99, 0.04), 3)])
+    grid3 = grid3 if grid3 is not None else np.concatenate([[999.0], np.round(np.arange(0.40, 0.99, 0.04), 3)])
 
     ents = list(truth.keys())
     code = {e: i for i, e in enumerate(ents)}
@@ -370,6 +348,9 @@ def _tune_threshold_v2(df, truth, exclusive, grid1, grid2, grid3):
     d = _assign_and_rank(df[cols].copy(), exclusive)
     d = d[d["s1_id"].isin(code)].reset_index(drop=True)
 
+    if len(d) == 0:
+        return {"method": "threshold", "exclusive": exclusive, "t1_s2": 0.68, "t2_s2": 0.72}
+
     ent = d["s1_id"].map(code).values
     rank = d["rank"].values
     p = d["p"].values
@@ -381,54 +362,77 @@ def _tune_threshold_v2(df, truth, exclusive, grid1, grid2, grid3):
     else:
         is_s3 = np.zeros(len(d), dtype=bool)
 
-    best = (-1.0, None)
+    def _eval(t1_s2, t2_s2, t1_s3, t2_s3, t3_val):
+        t1_arr = np.where(is_s3, t1_s3, t1_s2)
+        t2_arr = np.where(is_s3, t2_s3, t2_s2)
+        thr = np.where(rank == 1, t1_arr, t2_arr)
+        if t3_val is not None and t3_val < 999.0:
+            thr = np.where(rank >= 3, t3_val, thr)
+        keep = p >= thr
+        pred_cnt = np.bincount(ent, weights=keep.astype(float), minlength=n)
+        tp_cnt = np.bincount(ent, weights=(keep & lab).astype(float), minlength=n)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            f = 1.25 * tp_cnt / (1.25 * tp_cnt + 0.25 * (true_cnt - tp_cnt) + (pred_cnt - tp_cnt))
+        f = np.where(true_cnt == 0, (pred_cnt == 0).astype(float),
+                     np.where(tp_cnt == 0, 0.0, f))
+        return float(f.mean())
 
-    for t1_s2, t2_s2 in itertools.product(grid1, grid2):
-        if t2_s2 < t1_s2:
+    # Step 1: Joint sweep across all sources
+    best_joint = (-1.0, 0.68, 0.72)
+    for t1, t2 in itertools.product(grid1, grid2):
+        if t2 < t1:
             continue
-        for t1_s3, t2_s3 in itertools.product(grid1, grid2):
-            if t2_s3 < t1_s3:
+        sc = _eval(t1, t2, t1, t2, None)
+        if sc > best_joint[0]:
+            best_joint = (sc, float(t1), float(t2))
+
+    t1_s2, t2_s2 = best_joint[1], best_joint[2]
+    t1_s3, t2_s3 = t1_s2, t2_s2
+    best_score = best_joint[0]
+
+    # Step 2: Coordinate search on S3
+    if has_src and np.any(is_s3):
+        for t1, t2 in itertools.product(grid1, grid2):
+            if t2 < t1:
                 continue
-            # Compute per-row effective threshold (without t3)
-            t1_arr = np.where(is_s3, t1_s3, t1_s2)
-            t2_arr = np.where(is_s3, t2_s3, t2_s2)
-            base_thr = np.where(rank == 1, t1_arr, t2_arr)
+            sc = _eval(t1_s2, t2_s2, t1, t2, None)
+            if sc > best_score:
+                best_score, t1_s3, t2_s3 = sc, float(t1), float(t2)
 
-            for t3_val in grid3:
-                if t3_val >= 999.0:
-                    thr = base_thr
-                    t3_param = None
-                else:
-                    thr = np.where(rank >= 3, t3_val, base_thr)
-                    t3_param = float(t3_val)
+    # Step 3: Coordinate search on S2
+    for t1, t2 in itertools.product(grid1, grid2):
+        if t2 < t1:
+            continue
+        sc = _eval(t1, t2, t1_s3, t2_s3, None)
+        if sc > best_score:
+            best_score, t1_s2, t2_s2 = sc, float(t1), float(t2)
 
-                keep = p >= thr
-                pred_cnt = np.bincount(ent, weights=keep.astype(float), minlength=n)
-                tp_cnt = np.bincount(ent, weights=(keep & lab).astype(float), minlength=n)
-                with np.errstate(divide="ignore", invalid="ignore"):
-                    f = 1.25 * tp_cnt / (1.25 * tp_cnt + 0.25 * (true_cnt - tp_cnt) + (pred_cnt - tp_cnt))
-                f = np.where(true_cnt == 0, (pred_cnt == 0).astype(float),
-                             np.where(tp_cnt == 0, 0.0, f))
-                score = float(f.mean())
+    # Step 4: Coordinate search on t3 (rank >= 3)
+    best_t3 = None
+    for t3_val in grid3:
+        if t3_val >= 999.0:
+            continue
+        sc = _eval(t1_s2, t2_s2, t1_s3, t2_s3, t3_val)
+        if sc > best_score:
+            best_score, best_t3 = sc, float(t3_val)
 
-                if score > best[0]:
-                    best = (score, {
-                        "method": "threshold",
-                        "exclusive": exclusive,
-                        "t1_s2": float(t1_s2),
-                        "t2_s2": float(t2_s2),
-                        "t1_s3": float(t1_s3),
-                        "t2_s3": float(t2_s3),
-                        **({"t3": t3_param} if t3_param is not None else {}),
-                    })
-    return best[1]
+    result_params = {
+        "method": "threshold",
+        "exclusive": exclusive,
+        "t1_s2": float(t1_s2),
+        "t2_s2": float(t2_s2),
+        "t1_s3": float(t1_s3),
+        "t2_s3": float(t2_s3),
+    }
+    if best_t3 is not None:
+        result_params["t3"] = float(best_t3)
+    return result_params
 
 
 # ------------------------------------------------------------------ expected-F0.5 tuner
 
 def _tune_expected_f05(df, truth, exclusive):
-    """Expected-F0.5 method has no free thresholds — just validate n_true_est."""
-    # Try a few values of n_true_est
+    """Expected-F0.5 method: tune n_true_est on tune set."""
     best = (-1.0, None)
     cols = ["s1_id", "cand_id", "p"]
     if "src" in df.columns:
@@ -449,17 +453,44 @@ def _tune_prob_sum(df, truth, exclusive, grid1, grid2):
     """Grid-search ps_t1 and ps_tmin for prob_sum method."""
     grid1 = grid1 if grid1 is not None else np.round(np.arange(0.02, 0.40, 0.04), 3)
     grid2 = grid2 if grid2 is not None else np.round(np.arange(0.05, 0.60, 0.04), 3)
-    cols = ["s1_id", "cand_id", "p"]
+    cols = ["s1_id", "cand_id", "p", "label"]
     if "src" in df.columns:
-        cols = ["s1_id", "cand_id", "src", "p"]
+        cols = ["s1_id", "cand_id", "src", "p", "label"]
     d = _assign_and_rank(df[cols].copy(), exclusive)
+
+    ents = list(truth.keys())
+    code = {e: i for i, e in enumerate(ents)}
+    n = len(ents)
+    true_cnt = np.array([len(truth[e]) for e in ents], dtype=np.float64)
+    d = d[d["s1_id"].isin(code)].reset_index(drop=True)
+
+    if len(d) == 0:
+        return {"method": "prob_sum", "exclusive": exclusive, "ps_t1": 0.02, "ps_tmin": 0.10, "ps_cap": 30}
+
+    ent = d["s1_id"].map(code).values
+    rank = d["rank"].values
+    p = d["p"].values
+    lab = d["label"].values.astype(bool)
+
+    sum_p = d.groupby("s1_id")["p"].transform("sum").values
+    k_target = np.clip(np.round(sum_p), 1, 30)
+    rank1_p = d.groupby("s1_id")["p"].transform("first").values
+
     best = (-1.0, None)
     for t1, tmin in itertools.product(grid1, grid2):
-        params = {"method": "prob_sum", "exclusive": exclusive,
-                  "ps_t1": float(t1), "ps_tmin": float(tmin), "ps_cap": 30}
-        f = _score_v2(d, truth, params)
-        if f > best[0]:
-            best = (f, params)
+        keep = (rank1_p >= t1) & (rank <= k_target) & ((p >= tmin) | (rank == 1))
+        pred_cnt = np.bincount(ent, weights=keep.astype(float), minlength=n)
+        tp_cnt = np.bincount(ent, weights=(keep & lab).astype(float), minlength=n)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            f = 1.25 * tp_cnt / (1.25 * tp_cnt + 0.25 * (true_cnt - tp_cnt) + (pred_cnt - tp_cnt))
+        f = np.where(true_cnt == 0, (pred_cnt == 0).astype(float),
+                     np.where(tp_cnt == 0, 0.0, f))
+        score = float(f.mean())
+        if score > best[0]:
+            best = (score, {
+                "method": "prob_sum", "exclusive": exclusive,
+                "ps_t1": float(t1), "ps_tmin": float(tmin), "ps_cap": 30
+            })
     return best[1]
 
 
@@ -493,25 +524,12 @@ def run_full_tune(oof_path, truth_path, out_params_path, out_report_path,
     # Build truth dict: {s1_id: set_of_true_cand_ids}
     # Per TEAM_PLAN.md: for every business in run3_truth, the true set is {candidates with label == 1}
     # plus n_true - n_true_found dummy IDs so that missed matches count as false negatives.
-    found_true = (oof[oof["label"] == 1]
-                  .groupby("s1_id")["cand_id"]
-                  .apply(set)
-                  .to_dict())
-
-    truth_records = truth_df.set_index("s1_id").to_dict(orient="index") if "s1_id" in truth_df.columns else {}
-    all_s1_ids = set(truth_records.keys()) | set(oof["s1_id"].unique())
-
+    found = oof[oof["label"] == 1].groupby("s1_id")["cand_id"].apply(set).to_dict()
     truth_map = {}
-    for s1_id in all_s1_ids:
-        cands = set(found_true.get(s1_id, set()))
-        if s1_id in truth_records:
-            rec = truth_records[s1_id]
-            n_true = int(rec.get("n_true", len(cands)))
-            n_found = int(rec.get("n_true_found", len(cands)))
-            misses = max(0, n_true - n_found)
-            for i in range(misses):
-                cands.add(f"__miss_{s1_id}_{i}")
-        truth_map[s1_id] = cands
+    for s, n_true in zip(truth_df["s1_id"], truth_df["n_true"]):
+        t = set(found.get(s, ()))
+        t |= {f"__miss_{s}_{i}" for i in range(int(n_true) - len(t))}
+        truth_map[s] = t
 
     # Baseline: v1 tune
     print("Computing baseline (v1) …")
@@ -574,7 +592,7 @@ def run_full_tune(oof_path, truth_path, out_params_path, out_report_path,
         json.dumps(best_params, indent=2),
         "",
         "## Interpretation",
-        "  Tune half = fold in (0, 1) if fold column present, else deterministic MD5 split (no leakage).",
+        "  Tune half = fold in (0, 1) if fold column present, else deterministic zlib.crc32 split (no leakage).",
         "  Held-out F0.5 is the honest estimate of leaderboard gain.",
         "  Params written to decision_params.json for use by L1 in run 5.",
     ]

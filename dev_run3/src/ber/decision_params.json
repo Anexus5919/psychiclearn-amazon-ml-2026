@@ -1,20 +1,56 @@
 {
-  "_note": "Placeholder — will be overwritten by `python -m ber.decide --oof run3_oof.parquet --truth run3_truth.parquet` once L1 posts the OOF files.",
-  "_status": "AWAITING_L1_OOF_DATA",
   "selected_method": "threshold",
   "baseline_v1": {
     "t1": 0.68,
     "t2": 0.72,
-    "oof_f05": 0.9613
+    "oof_f05": 0.96127
   },
   "params": {
     "method": "threshold",
     "exclusive": true,
-    "t1_s2": 0.68,
-    "t2_s2": 0.72,
-    "t1_s3": 0.68,
-    "t2_s3": 0.72
+    "t1_s2": 0.66,
+    "t2_s2": 0.66,
+    "t1_s3": 0.7,
+    "t2_s3": 0.7,
+    "t3": 0.76
   },
-  "all_methods": [],
-  "_retuning_note": "When L1 posts run4_oof.parquet, re-run the same command with --oof run4_oof.parquet (15 min) and commit updated params."
+  "all_methods": [
+    {
+      "method": "threshold",
+      "tune_f05": 0.961209,
+      "held_f05": 0.961311,
+      "params": {
+        "method": "threshold",
+        "exclusive": true,
+        "t1_s2": 0.66,
+        "t2_s2": 0.66,
+        "t1_s3": 0.7,
+        "t2_s3": 0.7,
+        "t3": 0.76
+      }
+    },
+    {
+      "method": "expected_f05",
+      "tune_f05": 0.907661,
+      "held_f05": 0.906694,
+      "params": {
+        "method": "expected_f05",
+        "exclusive": true,
+        "n_true_est": 5.0,
+        "max_k": 30
+      }
+    },
+    {
+      "method": "prob_sum",
+      "tune_f05": 0.958124,
+      "held_f05": 0.958439,
+      "params": {
+        "method": "prob_sum",
+        "exclusive": true,
+        "ps_t1": 0.38,
+        "ps_tmin": 0.57,
+        "ps_cap": 30
+      }
+    }
+  ]
 }

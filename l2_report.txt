@@ -1,0 +1,33 @@
+# L2 Decision Tuning Report
+
+OOF file : run3_oof.parquet
+Truth file: run3_truth.parquet
+
+## Baseline (v1)
+  t1=0.68  t2=0.72  OOF macro F0.5 = 0.961270
+
+## Per-method held-out F0.5 (tuned on first half, evaluated on second half)
+
+Method                Tune F0.5    Held F0.5
+--------------------------------------------
+threshold              0.961209     0.961311
+expected_f05           0.907661     0.906694
+prob_sum               0.958124     0.958439
+
+Selected method: threshold  (best held-out F0.5 = 0.961311)
+
+## Selected params
+{
+  "method": "threshold",
+  "exclusive": true,
+  "t1_s2": 0.66,
+  "t2_s2": 0.66,
+  "t1_s3": 0.7,
+  "t2_s3": 0.7,
+  "t3": 0.76
+}
+
+## Interpretation
+  Tune half = fold in (0, 1) if fold column present, else deterministic zlib.crc32 split (no leakage).
+  Held-out F0.5 is the honest estimate of leaderboard gain.
+  Params written to decision_params.json for use by L1 in run 5.
