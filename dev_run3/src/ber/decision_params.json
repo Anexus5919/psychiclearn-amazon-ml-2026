@@ -1,0 +1,20 @@
+{
+  "_note": "Placeholder — will be overwritten by `python -m ber.decide --oof run3_oof.parquet --truth run3_truth.parquet` once L1 posts the OOF files.",
+  "_status": "AWAITING_L1_OOF_DATA",
+  "selected_method": "threshold",
+  "baseline_v1": {
+    "t1": 0.68,
+    "t2": 0.72,
+    "oof_f05": 0.9613
+  },
+  "params": {
+    "method": "threshold",
+    "exclusive": true,
+    "t1_s2": 0.68,
+    "t2_s2": 0.72,
+    "t1_s3": 0.68,
+    "t2_s3": 0.72
+  },
+  "all_methods": [],
+  "_retuning_note": "When L1 posts run4_oof.parquet, re-run the same command with --oof run4_oof.parquet (15 min) and commit updated params."
+}
