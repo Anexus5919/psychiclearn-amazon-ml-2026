@@ -54,13 +54,11 @@ Columns: `s1_id, cand_id, dense_cos, dense_rank` (top-15 per S1 record, per coun
 
 ## Smoke test results
 
-*(To be filled in by L2 after running SMOKE=1 on Kaggle)*
-
-- [ ] `GPUs: 2` confirmed
-- [ ] `fine-tuning on 20,000 pairs` shown
-- [ ] `fine-tuning done` shown
-- [ ] Country lines for train India/US and test France/India/US shown
-- [ ] `ALL DONE (SMOKE TEST - outputs are NOT usable; set SMOKE = 0)` shown
+- [x] `GPUs: 2` confirmed (`['Tesla T4', 'Tesla T4']`)
+- [x] `fine-tuning on 20,000 pairs` shown (validation businesses excluded: 304,555)
+- [x] `fine-tuning done` shown (loss: 2.9776 at step 0)
+- [x] Country lines for train India/US and test France/India/US shown
+- [x] `ALL DONE (SMOKE TEST - outputs are NOT usable; set SMOKE = 0)` shown (Total runtime: 4.9 min)
 
 ## Real run results
 
