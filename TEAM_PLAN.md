@@ -439,3 +439,16 @@ Only L1 merges, and only through code on `main` plus the pipeline's own validati
 1. Each ingredient must show **old vs new F0.5 on the same held-out businesses**, gain ≥ +0.0005.
 2. L1 re-runs `train` + `predict` with the ingredient and checks OOF F0.5 and the validator.
 3. The upload happens only if the OOF beats the best so far. The last upload is always the best-validated file.
+
+### 7.12 Update 26 Sep ~18:30 IST: WS8 dense retrieval ("meaning search"), owner **L2** (agreed by Adarsh)
+
+- **Why:** run-4 retrieval misses 5.6% of India's true matches (script changes, crowding). A fine-tuned
+  e5-small bi-encoder finds records by learned similarity instead of spelling.
+- **Steps:** follow `kaggle/DENSE_GUIDE_L2.md`. Inputs: the dataset zip + `train_queries.parquet` (both
+  in release `from-L1`); script `kaggle/dense_retrieval.py` (smoke-tested locally by L1).
+- **Output (release `from-L2`):** `dense_train.parquet`, `dense_test.parquet` (`s1_id, cand_id,
+  dense_cos, dense_rank`, top-15 per business).
+- **Gate (L1):** the share of run-5 *missed* true pairs (validation businesses, excluded from
+  fine-tuning) that dense top-15 recovers. Continue only if it is substantial. Then run 6 = run 5 + a
+  dense pass, uploaded only if the OOF beats run 5.
+- **Fallback:** if the gate fails or Kaggle breaks, run 5 (plus ce2) stays final.
