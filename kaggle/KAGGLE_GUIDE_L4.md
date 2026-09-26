@@ -11,10 +11,14 @@ Kaggle gives two T4 GPUs (16 GB each) for free, and the job keeps running after 
 
 **Your time:** about 30 minutes of clicking. The rest runs unattended.
 
-| Phase | When | Kaggle runtime (estimate) |
+All three input files are ready in release `from-L1`, so you need **only one Kaggle run**. The script
+trains the model, then scores both score files in the same run.
+
+| Part of the run | Pairs | Kaggle runtime (estimate) |
 |---|---|---|
-| 1. Train | as soon as `ce_train.parquet` is in release `from-L1` | about 1-2 h |
-| 2. Score | now: `score_train.parquet` (90 MB, 1.9M pairs) + `score_test.parquet` (576 MB, 13.3M pairs) are in release `from-L1` | about 1.5-3 h |
+| Train on `ce_train.parquet` (30 MB) | 1.02M | about 1-2 h |
+| Score `score_train.parquet` (90 MB) + `score_test.parquet` (576 MB) | 15.2M | about 1.5-3 h |
+| **Total** | | **about 2.5-5 h**, under Kaggle's 12 h limit |
 
 The runtimes are estimates, because this model has never been run on a T4. The log shows the real ETA.
 
@@ -38,18 +42,19 @@ The runtimes are estimates, because this model has never been run on a T4. The l
    GPU and Internet options stay greyed out.
 3. Accept Adarsh's invite to the private repo `Anexus5919/psychiclearn-amazon-ml-2026`. The email or
    notification comes from GitHub.
-4. Get two files from the repo:
-   - **`ce_train.parquet`:** repo page, then **Releases** (right sidebar), then **`from-L1`**, then click
-     `ce_train.parquet` under *Assets*. It is about 1.02M labelled pairs, roughly 50-150 MB.
+4. Get the files from the repo:
+   - **Data:** repo page, then **Releases** (right sidebar), then **`from-L1`**. Under *Assets*, download
+     `ce_train.parquet`, `score_train.parquet` and `score_test.parquet`.
    - **The script:** the folder `kaggle/`, file `mdeberta_cross_encoder.py`. Open it and use the **Raw**
      button or the copy icon.
 
-## Step 1: upload the training data as a private dataset
+## Step 1: upload the data as a private dataset
 
 1. kaggle.com, then **Create**, then **New Dataset**.
-2. Drag in `ce_train.parquet`.
+2. Drag in all three files: `ce_train.parquet`, `score_train.parquet`, `score_test.parquet`. Together
+   they are about 700 MB, so the upload may take a while.
 3. Title: `psychiclearn-ce`. Check that visibility is **Private**. Click **Create**.
-4. Wait until the dataset page shows the file (1-2 min).
+4. Wait until the dataset page shows all three files.
 
 ## Step 2: create the notebook
 
@@ -77,7 +82,7 @@ This catches problems in 5 minutes instead of 2 hours.
 4. If you see an error instead, check the Troubleshooting section below or send Adarsh a screenshot.
 5. **Set `SMOKE = 0` again.** This is important: a smoke-test model is useless.
 
-## Step 4: the real training run (phase 1)
+## Step 4: the real run (train + score)
 
 1. Make sure `SMOKE = 0`.
 2. Top right: **Save Version**, then **Save & Run All (Commit)**, then **Save**.
@@ -86,37 +91,44 @@ This catches problems in 5 minutes instead of 2 hours.
    - Every 500 steps, a loss line appears. There are about 8,000 steps in total, and the loss should
      fall from about 0.3 towards 0.02-0.05.
    - If the loss shows `nan`, see Troubleshooting.
-5. When it finishes, the log ends with `training done in N min` and `ALL DONE`.
-6. **Write down** the training time and the last loss value, then post both in the team chat.
-7. The version's **Output** tab now contains a `mdeberta_ce/` folder, about 1.1 GB. This is the trained
-   model. **Don't delete this notebook version**, because phase 2 reuses it.
+5. After training, the log shows `training done in N min`. Scoring comes next, and the log ends with:
+   - `scored train: 1,902,831 pairs`
+   - `scored test: 13,282,792 pairs`
+   - `ALL DONE`
+6. **Write down** the training time, the last loss value and the scoring time.
+7. From the version's **Output** tab, download `ce2_train.parquet` and `ce2_test.parquet`. Upload them to
+   **your** release: repo page, then **Releases**, then **`from-L4`**, then the pencil icon (Edit), then
+   drag the files into *Attach binaries*, then **Update release**. Put the three numbers from item 6 in
+   the release description.
+8. The Output tab also has a `mdeberta_ce/` folder, about 1.1 GB. This is the trained model. **Don't
+   delete this notebook version**, in case Adarsh needs more pairs scored later (see Step 5).
 
-## Step 5: scoring run (phase 2)
+You're done. Tell Adarsh.
 
-Start this when Adarsh posts `score_train.parquet` and `score_test.parquet` in release `from-L1`.
+## Step 5 (only if Adarsh asks): scoring new pairs without retraining
+
+Use this if Adarsh posts **new** score files later, or if the Step 4 run was stopped after training.
 
 1. Add the score files to your dataset:
    1. Open your dataset `psychiclearn-ce`.
    2. Click **New Version**.
-   3. Upload both score files, and keep `ce_train.parquet`.
+   3. Upload the new score files (replacing the old ones with the same names), and keep `ce_train.parquet`.
    4. Save.
-2. Open the notebook `psychiclearn-mdeberta` in edit mode.
-3. In the right-hand panel under Input, the dataset may say that a newer version exists. If so, click
-   **update**, or remove the dataset and add it again.
-4. Attach your trained model:
+2. Create a **new** notebook named `psychiclearn-mdeberta-score`, set up exactly like Step 2: GPU T4 x2,
+   Internet On, dataset `psychiclearn-ce` added, and the whole script pasted into one cell.
+3. Attach your trained model:
    1. Click **Add Input**.
    2. Open **Your Work**, then **Notebooks**.
-   3. Pick `psychiclearn-mdeberta`, which is this same notebook's phase-1 output.
-5. Check that `SMOKE = 0`. Then choose **Save Version**, then **Save & Run All (Commit)**.
-6. **Check the first lines of the log.** One of them must say `SCORE-ONLY mode: using trained model at ...`.
-   - If it starts training instead, the model input is not attached. Cancel the run and repeat step 4.
-7. At the end, the log shows `scored train: ... pairs` and `scored test: ... pairs`, then `ALL DONE`.
-8. From the version's **Output** tab, download `ce2_train.parquet` and `ce2_test.parquet`.
-9. Upload both files to **your** release: repo page, then **Releases**, then **`from-L4`**, then the pencil
+   3. Pick `psychiclearn-mdeberta`, the notebook from Step 4. Its output holds `mdeberta_ce/`.
+4. Check that `SMOKE = 0`. Then choose **Save Version**, then **Save & Run All (Commit)**.
+5. **Check the first lines of the log.** One of them must say `SCORE-ONLY mode: using trained model at ...`.
+   - If it starts training instead, the model input is not attached. Cancel the run and repeat step 3.
+6. At the end, the log shows `scored train: ... pairs` and `scored test: ... pairs`, then `ALL DONE`.
+7. From the version's **Output** tab, download `ce2_train.parquet` and `ce2_test.parquet`.
+8. Upload both files to **your** release: repo page, then **Releases**, then **`from-L4`**, then the pencil
    icon (Edit), then drag the files into *Attach binaries*, then **Update release**. In the release
    description, write:
-   - the phase-1 training time and final loss;
-   - the phase-2 scoring time;
+   - the scoring time;
    - anything odd you noticed.
 
 You're done with the Kaggle part. Tell Adarsh.
