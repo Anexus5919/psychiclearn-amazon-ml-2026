@@ -64,6 +64,7 @@ else:
     ds = Pairs(tr["text_a"], tr["text_b"], tr["label"].values)
     print(f"tokenised in {time.time() - t0:.0f}s")
     model = AutoModelForSequenceClassification.from_pretrained(MODEL, num_labels=1, problem_type="regression")
+    model = model.float()
 
 
 class BCETrainer(Trainer):
@@ -75,9 +76,9 @@ class BCETrainer(Trainer):
 
 
 if not trained:  # phase 1: fine-tune and save the model (phase 2 reuses it as an input dataset)
-    args = TrainingArguments(output_dir=f"{OUT}/ckpt", per_device_train_batch_size=64, learning_rate=3e-5,
-                             num_train_epochs=1, warmup_ratio=0.05, weight_decay=0.01, fp16=True, logging_steps=500,
-                             save_strategy="no", report_to=[], dataloader_num_workers=2, max_grad_norm=1.0)
+    args = TrainingArguments(output_dir=f"{OUT}/ckpt", per_device_train_batch_size=32, gradient_accumulation_steps=2,
+                             learning_rate=3e-5, num_train_epochs=1, warmup_ratio=0.05, weight_decay=0.01, fp16=False,
+                             logging_steps=500, save_strategy="no", report_to=[], dataloader_num_workers=2, max_grad_norm=1.0)
     BCETrainer(model=model, args=args, train_dataset=ds, data_collator=DataCollatorWithPadding(tok)).train()
     model.save_pretrained(f"{OUT}/mdeberta_ce")
     tok.save_pretrained(f"{OUT}/mdeberta_ce")
