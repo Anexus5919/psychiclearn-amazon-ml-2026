@@ -19,7 +19,9 @@ import pyarrow as pa, pyarrow.csv as pv
 from transformers import AutoModel, AutoTokenizer
 
 SMOKE = 0            # set to 1 for a ~5-minute test on small samples; MUST be 0 for the real run
-MODEL, MAXLEN, K = "intfloat/multilingual-e5-small", 64, 15
+ONLY_FRANCE = 0      # set to 1 to run only France test split (~15 min with cached model)
+MODEL, MAXLEN = "intfloat/multilingual-e5-small", 64
+K_DEFAULT, K_FRANCE = 15, 20
 N_TRAIN_PAIRS, BATCH, LR, TAU = 2_000_000, 256, 3e-5, 0.05
 OUT = os.environ.get("BER_OUT", "/kaggle/working")
 IN = os.environ.get("BER_IN")
@@ -55,9 +57,24 @@ def log(m):
 
 
 n_gpu = torch.cuda.device_count()
-log(f"GPUs: {n_gpu} {[torch.cuda.get_device_name(i) for i in range(n_gpu)]}")
-tok = AutoTokenizer.from_pretrained(MODEL)
-enc = AutoModel.from_pretrained(MODEL).cuda()
+def find_model_dir():
+    patterns = ["/kaggle/input/**/dense_model", "/kaggle/working/dense_model", "./dense_model"]
+    if IN:
+        patterns.insert(0, os.path.join(IN, "**", "dense_model"))
+    for pat in patterns:
+        hits = [h for h in sorted(glob.glob(pat, recursive=True)) if os.path.isdir(h) and os.path.exists(os.path.join(h, "config.json"))]
+        if hits:
+            return hits[0]
+    return None
+
+cached_model = find_model_dir()
+if cached_model:
+    log(f"Found existing fine-tuned model at {cached_model}; skipping fine-tuning stage!")
+    tok = AutoTokenizer.from_pretrained(cached_model)
+    enc = AutoModel.from_pretrained(cached_model).cuda()
+else:
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    enc = AutoModel.from_pretrained(MODEL).cuda()
 net = torch.nn.DataParallel(enc) if n_gpu > 1 else enc
 
 
@@ -70,44 +87,45 @@ def embed_batch(texts):
 
 
 # ---------------------------------------------------------------- 1. fine-tune on training pairs
-queries = set(pd.read_parquet(find("train_queries.parquet"))["s1_id"])
-gt = read_tsv(find("train_ground_truth.tsv"), ["source1_entity_id", "matched_entity_ids"])
-gt = gt[(gt["matched_entity_ids"] != "") & ~gt["source1_entity_id"].isin(queries)]
-pairs = gt.assign(m=gt["matched_entity_ids"].str.split(",")).explode("m")[["source1_entity_id", "m"]]
-del gt
-pairs = pairs.sample(min(N_TRAIN_PAIRS if not SMOKE else 20_000, len(pairs)), random_state=0)
-s1 = source("train", 1).set_index("entity_id")["text"]
-pool_text = pd.concat([source("train", 2), source("train", 3)]).set_index("entity_id")["text"]
-A = s1.loc[pairs["source1_entity_id"]].values
-B = pool_text.loc[pairs["m"]].values
-del pairs, pool_text
-log(f"fine-tuning on {len(A):,} pairs (validation businesses excluded: {len(queries):,})")
-opt = torch.optim.AdamW(enc.parameters(), lr=LR, weight_decay=0.01)
-steps = len(A) // BATCH
-sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / (0.05 * steps)) * max(0.0, (steps - s) / steps))
-scaler = torch.cuda.amp.GradScaler()
-net.train()
-labels = torch.arange(BATCH, device="cuda")
-for i in range(steps):
-    sl = slice(i * BATCH, (i + 1) * BATCH)
-    with torch.autocast("cuda", dtype=torch.float16):
-        qa, qb = embed_batch(list(A[sl])), embed_batch(list(B[sl]))
-        logits = (qa @ qb.T).float() / TAU
-        loss = (F.cross_entropy(logits, labels) + F.cross_entropy(logits.T, labels)) / 2
-    opt.zero_grad(set_to_none=True)
-    scaler.scale(loss).backward()
-    scaler.unscale_(opt)
-    torch.nn.utils.clip_grad_norm_(enc.parameters(), 1.0)
-    scaler.step(opt)
-    scaler.update()
-    sched.step()
-    if i % 500 == 0:
-        log(f"  step {i}/{steps} loss {loss.item():.4f}")
-net.eval()
-del A, B
-enc.save_pretrained(f"{OUT}/dense_model")
-tok.save_pretrained(f"{OUT}/dense_model")
-log("fine-tuning done")
+if not cached_model:
+    queries = set(pd.read_parquet(find("train_queries.parquet"))["s1_id"])
+    gt = read_tsv(find("train_ground_truth.tsv"), ["source1_entity_id", "matched_entity_ids"])
+    gt = gt[(gt["matched_entity_ids"] != "") & ~gt["source1_entity_id"].isin(queries)]
+    pairs = gt.assign(m=gt["matched_entity_ids"].str.split(",")).explode("m")[["source1_entity_id", "m"]]
+    del gt
+    pairs = pairs.sample(min(N_TRAIN_PAIRS if not SMOKE else 20_000, len(pairs)), random_state=0)
+    s1 = source("train", 1).set_index("entity_id")["text"]
+    pool_text = pd.concat([source("train", 2), source("train", 3)]).set_index("entity_id")["text"]
+    A = s1.loc[pairs["source1_entity_id"]].values
+    B = pool_text.loc[pairs["m"]].values
+    del pairs, pool_text
+    log(f"fine-tuning on {len(A):,} pairs (validation businesses excluded: {len(queries):,})")
+    opt = torch.optim.AdamW(enc.parameters(), lr=LR, weight_decay=0.01)
+    steps = len(A) // BATCH
+    sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda s: min(1.0, (s + 1) / (0.05 * steps)) * max(0.0, (steps - s) / steps))
+    scaler = torch.cuda.amp.GradScaler()
+    net.train()
+    labels = torch.arange(BATCH, device="cuda")
+    for i in range(steps):
+        sl = slice(i * BATCH, (i + 1) * BATCH)
+        with torch.autocast("cuda", dtype=torch.float16):
+            qa, qb = embed_batch(list(A[sl])), embed_batch(list(B[sl]))
+            logits = (qa @ qb.T).float() / TAU
+            loss = (F.cross_entropy(logits, labels) + F.cross_entropy(logits.T, labels)) / 2
+        opt.zero_grad(set_to_none=True)
+        scaler.scale(loss).backward()
+        scaler.unscale_(opt)
+        torch.nn.utils.clip_grad_norm_(enc.parameters(), 1.0)
+        scaler.step(opt)
+        scaler.update()
+        sched.step()
+        if i % 500 == 0:
+            log(f"  step {i}/{steps} loss {loss.item():.4f}")
+    net.eval()
+    del A, B
+    enc.save_pretrained(f"{OUT}/dense_model")
+    tok.save_pretrained(f"{OUT}/dense_model")
+    log("fine-tuning done")
 
 
 # ---------------------------------------------------------------- 2. embed + nearest neighbours
@@ -135,25 +153,33 @@ def knn(q, p, k, chunk=512):
     return idx, sc
 
 
-for split in ("train", "test"):
+splits = ("test",) if ONLY_FRANCE else ("train", "test")
+for split in splits:
     s1 = source(split, 1)
     if split == "train":
         s1 = s1[s1["entity_id"].isin(queries)]
     pool = pd.concat([source(split, 2), source(split, 3)], ignore_index=True)
     parts = []
-    for country in sorted(s1["country"].unique()):
+    countries = ["France"] if ONLY_FRANCE else sorted(s1["country"].unique())
+    for country in countries:
         q = s1[s1["country"] == country]
         p = pool[pool["country"] == country]
+        k_val = K_FRANCE if country == "France" else K_DEFAULT
         if SMOKE:
             q, p = q.head(2000), p.head(50_000)
-        log(f"{split} {country}: embedding {len(q):,} S1 + {len(p):,} S2/S3 records")
+        log(f"{split} {country}: embedding {len(q):,} S1 + {len(p):,} S2/S3 records (k={k_val})")
         qe, pe = embed_all(q["text"].tolist()), embed_all(p["text"].tolist())
-        idx, sc = knn(qe, pe, K)
-        parts.append(pd.DataFrame({
-            "s1_id": np.repeat(q["entity_id"].values, K), "cand_id": p["entity_id"].values[idx.ravel()],
-            "dense_cos": sc.ravel(), "dense_rank": np.tile(np.arange(1, K + 1, dtype=np.int16), len(q))}))
-        log(f"  {split} {country}: {len(q) * K:,} pairs")
+        idx, sc = knn(qe, pe, k_val)
+        df_part = pd.DataFrame({
+            "s1_id": np.repeat(q["entity_id"].values, k_val), "cand_id": p["entity_id"].values[idx.ravel()],
+            "dense_cos": sc.ravel(), "dense_rank": np.tile(np.arange(1, k_val + 1, dtype=np.int16), len(q))})
+        parts.append(df_part)
+        if country == "France" and split == "test":
+            df_part.to_parquet(f"{OUT}/dense_test_France.parquet", index=False)
+            log(f"  wrote {OUT}/dense_test_France.parquet ({len(df_part):,} pairs)")
+        log(f"  {split} {country}: {len(q) * k_val:,} pairs")
         del qe, pe
-    pd.concat(parts, ignore_index=True).to_parquet(f"{OUT}/dense_{split}.parquet", index=False)
-    log(f"wrote dense_{split}.parquet")
+    if parts:
+        pd.concat(parts, ignore_index=True).to_parquet(f"{OUT}/dense_{split}.parquet", index=False)
+        log(f"wrote dense_{split}.parquet")
 log("ALL DONE" + ("  (SMOKE TEST - outputs are NOT usable; set SMOKE = 0)" if SMOKE else ""))

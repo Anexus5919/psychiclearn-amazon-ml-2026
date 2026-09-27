@@ -244,7 +244,8 @@ def block_partition(s1, pool, query_mask, cfg, log=print, tmp_dir=None, dense=No
     all_pass, all_rank = np.concatenate(passes), np.concatenate(ranks)
     del keys, passes, ranks, all_keys
     cand = pd.DataFrame({"s1": (uniq // n_pool).astype(np.int64), "pool": (uniq % n_pool).astype(np.int64)})
-    ks["rev"], ks["region"], ks["dense"] = cfg.k_reverse, getattr(cfg, "k_region", 0), getattr(cfg, "k_dense", 15)
+    k_dense_val = 20 if (len(s1) and s1["country"].iloc[0] == "France") else getattr(cfg, "k_dense", 15)
+    ks["rev"], ks["region"], ks["dense"] = cfg.k_reverse, getattr(cfg, "k_region", 0), k_dense_val
     for pi, kind in enumerate(list(PASSES) + ["rev", "region", "dense"]):
         k = ks[kind]
         col = np.full(len(uniq), k + 1, np.int16)

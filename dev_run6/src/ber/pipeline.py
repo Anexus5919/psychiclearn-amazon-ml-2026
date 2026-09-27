@@ -228,7 +228,8 @@ def stage_pairs(cfg, splits=("train", "test")):
             fp = os.path.join(cfg.dense_dir, f"dense_{split}_{country}.parquet")
             d = pd.read_parquet(fp if os.path.exists(fp) else os.path.join(cfg.dense_dir, f"dense_{split}.parquet"),
                                 columns=["s1_id", "cand_id", "dense_cos", "dense_rank"])
-            return d[d["dense_rank"] <= cfg.k_dense]
+            k_lim = 20 if country == "France" else cfg.k_dense
+            return d[d["dense_rank"] <= k_lim]
         only = {c for c in cfg.only_countries.split(",") if c}
         for country in countries:
             if only and country not in only:
