@@ -7,14 +7,24 @@ e5 scores depend only on the two raw records, so earlier scores are valid for ev
 import glob, os, sys
 import pandas as pd
 
-OLDS = [r"C:\Users\ANEXUS\Downloads\PsychicLearn_work4\ce", r"C:\Users\ANEXUS\Downloads\PsychicLearn_work5\ce"]
-cmd, W = sys.argv[1], sys.argv[2]
-CE = os.path.join(W, "ce")
-os.makedirs(CE, exist_ok=True)
+OLDS = [
+    d for d in [
+        r"C:\Users\ANEXUS\Downloads\PsychicLearn_work4\ce",
+        r"C:\Users\ANEXUS\Downloads\PsychicLearn_work5\ce",
+        os.path.join(os.path.dirname(W), "PsychicLearn_work4", "ce"),
+        os.path.join(os.path.dirname(W), "PsychicLearn_work5", "ce")
+    ] if os.path.exists(d)
+]
 
 
 def old_scores(split):
-    parts = [pd.read_parquet(os.path.join(d, f"{split}.parquet"), columns=["s1_id", "cand_id", "ce_p"]) for d in OLDS]
+    parts = []
+    for d in OLDS:
+        fp = os.path.join(d, f"{split}.parquet")
+        if os.path.exists(fp):
+            parts.append(pd.read_parquet(fp, columns=["s1_id", "cand_id", "ce_p"]))
+    if not parts:
+        return pd.DataFrame(columns=["s1_id", "cand_id", "ce_p"])
     return pd.concat(parts, ignore_index=True).drop_duplicates(["s1_id", "cand_id"])
 
 
@@ -25,10 +35,14 @@ for split in ("train", "test"):
         for f in sorted(glob.glob(os.path.join(W, "pairs_pruned", split, "[!_]*.parquet"))):
             d = pd.read_parquet(f, columns=["s1_id", "cand_id", "pre_p"])
             parts.append(d[(d["pre_p"] >= lo) & (d["pre_p"] <= hi)][["s1_id", "cand_id"]])
-        band = pd.concat(parts, ignore_index=True)
+        band = pd.concat(parts, ignore_index=True).drop_duplicates(["s1_id", "cand_id"]) if parts else pd.DataFrame(columns=["s1_id", "cand_id"])
         band.to_parquet(os.path.join(CE, f"band_{split}.parquet"), index=False)
-        todo = band.merge(old_scores(split)[["s1_id", "cand_id"]], on=["s1_id", "cand_id"], how="left", indicator=True)
-        todo = todo[todo["_merge"] == "left_only"][["s1_id", "cand_id"]]
+        old = old_scores(split)
+        if len(old):
+            todo = band.merge(old[["s1_id", "cand_id"]], on=["s1_id", "cand_id"], how="left", indicator=True)
+            todo = todo[todo["_merge"] == "left_only"][["s1_id", "cand_id"]]
+        else:
+            todo = band
         todo.to_parquet(os.path.join(CE, f"todo_{split}.parquet"), index=False)
         print(f"{split}: band {len(band):,} pairs, already scored {len(band) - len(todo):,}, to score {len(todo):,}", flush=True)
     else:
