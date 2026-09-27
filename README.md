@@ -9,7 +9,8 @@ Private team repository. For each Source-1 business record, the task is to find 
 | Run 2 | Baseline: word/char TF-IDF retrieval → LightGBM → exclusive assignment + rank thresholds | 0.9515 (US 0.973, India 0.920) | **0.931** |
 | Run 3 | + learned Indic→Latin transliteration (India), + learned pruning (54 → 18 candidates per S1) | 0.9613 (US 0.973, India 0.944) | **0.941** |
 | Run 4 | + e5-small cross-encoder (MIT, 118M; stacked as a feature), bigger India search + exact-name pass, 304k training businesses, 16 new features | **0.9763** (US 0.982, India 0.967) | **0.963** |
-| Run 5 | + state/region-restricted name search, exact-name pass everywhere, look-alike/ID-tag name clean-up, wider e5 band, candidate file 22.6 → ~7 per S1 | running (26 Sep 16:32 →) | – |
+| Run 5 | + state/region-restricted name search, exact-name pass everywhere, look-alike/ID-tag name clean-up, wider e5 band, candidate file 22.6 → ~7 per S1 | 0.9779 (US 0.984, India 0.969) | **0.967** |
+| Run 6 | + dense retrieval (fine-tuned e5 bi-encoder, L2) as a search pass + features; + mDeBERTa-v3-base cross-encoder (L4) | **0.9877** (US 0.988, India 0.988) | **0.983** |
 
 France has no training labels. Worked out from the leaderboard, it scores ≈0.85 (run 3) and ≈0.90 (run 4). Full story and metrics: `JOURNEY.md`. Plan: `TEAM_PLAN.md` §7.
 
@@ -25,6 +26,8 @@ France has no training labels. Worked out from the leaderboard, it scores ≈0.8
 | `results/` | Gzipped `matching_results.tsv` of runs 2–4, validation reports and pruning rules, run-4 error analysis, pseudo-label proxy test, name-crowding measurement |
 | `kaggle/` | Cross-encoder script for Kaggle (train + score, or score-only with an attached model) and `KAGGLE_GUIDE_L4.md` |
 | Releases `from-L1` … `from-L4` | Big data files shared between teammates (validation data, features, cross-encoder inputs/outputs) |
+| `SUBMISSIONS.md` | **Version history of every leaderboard upload** (file SHA-256, code folder, git tag, scores) |
+| `dev_run6/` | Run-6 code (dense-retrieval pass + 2nd cross-encoder) + its scripts; current best (LB 0.983) |
 | `TEAM_PLAN.md` | **Who does what, in parallel, until the deadline** |
 | `HANDOFF.md` | Current state, paths and next steps |
 
