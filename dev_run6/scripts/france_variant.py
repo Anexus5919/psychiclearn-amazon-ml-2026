@@ -9,13 +9,17 @@ France effect (France has no labels, so this is the only way to measure a France
 """
 import json, os, shutil, sys
 import pandas as pd
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+repo_src = os.path.abspath(os.path.join(script_dir, "..", "src"))
+sys.path.insert(0, repo_src)
 sys.path.insert(0, r"C:\Users\ANEXUS\Downloads\PsychicLearn_dev\src")
 from ber import decide, io_utils, writer
 
-DATA = r"C:\Users\ANEXUS\Downloads\6ab10eb3b23ba_student_resource\student_resource\dataset"
 cmd, W = sys.argv[1], sys.argv[2]
 rep = json.load(open(os.path.join(W, "report_train.json")))
 T1, T2 = rep["t1"], rep["t2"]
+DATA = rep.get("config", {}).get("data_dir", r"C:\Users\ANEXUS\Downloads\6ab10eb3b23ba_student_resource\student_resource\dataset")
 df = pd.read_parquet(os.path.join(W, "test_pred.parquet"), columns=["s1_id", "cand_id", "p"])
 s1 = pd.read_parquet(os.path.join(W, "norm", "test_s1.parquet"), columns=["entity_id", "country"])
 country = s1.set_index("entity_id")["country"]
@@ -51,6 +55,8 @@ else:
     pred = run(t1f, t2f)
     ids = io_utils.read_source(DATA, "test", 1)["entity_id"].tolist()
     writer.write_id_lists(os.path.join(out, "matching_results.tsv"), "matched_entity_ids", ids, pred)
-    src_out = json.load(open(os.path.join(W, "report_train.json")))["config"]["out_dir"]
-    shutil.copy(os.path.join(src_out, "candidate_pairs.tsv"), os.path.join(out, "candidate_pairs.tsv"))
+    src_out = rep["config"]["out_dir"]
+    cand_path = os.path.join(src_out, "candidate_pairs.tsv")
+    if os.path.exists(cand_path):
+        shutil.copy(cand_path, os.path.join(out, "candidate_pairs.tsv"))
     print(f"written {out} with France t1={t1f} t2={t2f}: {stats(pred)}", flush=True)
