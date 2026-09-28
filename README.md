@@ -18,7 +18,8 @@ France has no training labels. Worked out from the leaderboard, it scores ≈0.8
 
 | Folder | Contents |
 |---|---|
-| `submission/` | Final-package structure. `code/business_entity_resolution/` is the version that produced the LB 0.931 file. `output/` stays empty here: the data files are too big for git. |
+| `submission/` | **Final code-submission package** (best submission = run 6, LB 0.982608): `code/business_entity_resolution/` + `Documentation_template.md`, identical to the uploaded zip (SHA-256 in `PACKAGE_SHA256.txt`). The output TSVs are archived in `results/` (too big for git uncompressed). |
+| `dev_run2/` | Run-2 code (submission 1), restored from tag `sub1-run2-LB0.931` |
 | `dev_run3/` | Run-3 code snapshot |
 | `dev_run4/` | Run-4 code snapshot (cross-encoder, extra/group features, exports) |
 | `dev_run5/` | **Newest code** (run 5: `ber/regions.py`, region pass in `ber/blocking.py`, `--ce-prefix ce2`, candidate trimming) + `scripts/` (run chain, error analyses, pseudo-label proxy test). It moves into `submission/` once validated. |

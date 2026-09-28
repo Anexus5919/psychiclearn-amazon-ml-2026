@@ -41,3 +41,12 @@ Resume one stage: `python -m ber.pipeline --data-dir <dataset> --work-dir <work5
 
 ## Rules to remember
 No real money (AWS Free plan only; free Kaggle only). No external data/APIs; pretrained models only MIT/Apache ≤ 8B. Output files LF-only; validator with `--check-ids` before every upload. Only Adarsh uploads.
+
+## Final state (28 Sep 2026)
+
+- **Best submission:** #5 = run 6, public LB **0.982608** (validation 0.98769). The leaderboard closed on
+  27 Sep 23:59 IST.
+- **Code Submission round (until 29 Sep 10:00 IST):** upload `Downloads\PsychicLearn_submission.zip`.
+  It contains the run-6 outputs (byte-identical to the leaderboard upload), the pipeline code, and the
+  filled documentation. Its content is in this repo under `submission/`; checksums are in
+  `SUBMISSIONS.md`.

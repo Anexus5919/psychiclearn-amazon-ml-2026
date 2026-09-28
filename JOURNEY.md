@@ -370,3 +370,25 @@ The full plan is in `TEAM_PLAN.md` §7. Realistic target: **≈0.97–0.975**. 0
 | **Pseudo-labelling** | Training on the model's own confident predictions for unlabelled data (tested for France; it hurt) |
 | **Crowding** | The right record falls out of the top-k list because many other records have the same name |
 | **Region pass** | Name search restricted to one state/region, to beat crowding (run 5) |
+
+---
+
+## 15. Run 6 and the finish (26–28 Sep)
+
+| Upload | Time | What it was | Public leaderboard |
+|---|---|---|---|
+| #4 | 26 Sep, 23:45 | Run 5: region-restricted search, exact-name pass everywhere, name clean-up | **0.967** |
+| #5 | 27 Sep, 03:18 | Run 6: + **dense retrieval** (L2) + **mDeBERTa cross-encoder** (L4) | **0.982608** (best) |
+
+**Dense retrieval** was the breakthrough:
+- `multilingual-e5-small` was fine-tuned as a bi-encoder on the training pairs, with the validation
+  businesses excluded.
+- On validation, it found 94.6% (India) and 82.3% (US) of the true matches that run 5's search missed.
+- Search recall rose from 0.9688 to **0.9955**, and India's validation score from 0.969 to **0.988**.
+- France (zero-shot) rose from about 0.918 to about **0.954**, worked out from the leaderboard.
+
+**The finish:**
+- The final code package (`submission/`, `SUBMISSIONS.md`) contains the run-6 outputs, the exact run-6
+  code, a one-command reproduction `run_all.py` (tested end to end), pinned requirements, and the
+  filled documentation.
+- Team: Adarsh Singh (leader), Atharva Waghmode, Sanjog Poojary, Atharva Gadge.

@@ -1,0 +1,9 @@
+# Python 3.12 (tested on Ubuntu 24.04 x86_64 and Windows 11). CPU only; no pretrained models are used.
+numpy==2.2.6
+scipy==1.15.3
+pandas==2.2.3
+pyarrow==20.0.0
+scikit-learn==1.6.1
+lightgbm==4.6.0
+rapidfuzz==3.13.0
+sparse_dot_topn==1.1.5
