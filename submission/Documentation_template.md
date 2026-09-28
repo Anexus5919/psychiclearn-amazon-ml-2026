@@ -1,7 +1,7 @@
 # ML Challenge 2026: Business Entity Resolution Solution Template
 
 **Team Name:** PsychicLearn  
-**Team Members:** Adarsh Singh (team leader), [TEAMMATE 2], [TEAMMATE 3], [TEAMMATE 4]  
+**Team Members:** Adarsh Singh (team leader), Atharva Waghmode, Sanjog Poojary, Atharva Gadge  
 **Submission Date:** 27 September 2026
 
 ---
