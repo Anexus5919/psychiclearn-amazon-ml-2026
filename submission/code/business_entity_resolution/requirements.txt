@@ -1,9 +1,26 @@
-# Python 3.12 (tested on Ubuntu 24.04 x86_64 and Windows 11). CPU only; no pretrained models are used.
+# Python 3.12 (tested with 3.12.3 on Windows 11; the GPU scripts also ran on Kaggle's Python image).
+# Exact versions of the environment that produced the submitted files.
+
+# --- core pipeline (CPU): normalisation, retrieval, features, LightGBM, decisions, writer
 numpy==2.2.6
-scipy==1.15.3
 pandas==2.2.3
 pyarrow==20.0.0
+scipy==1.15.3
 scikit-learn==1.6.1
-lightgbm==4.6.0
+sparse-dot-topn==1.1.5
 rapidfuzz==3.13.0
-sparse_dot_topn==1.1.5
+lightgbm==4.6.0
+
+# --- neural steps (GPU): cross-encoders and dense retrieval
+# torch with CUDA 12.8:  pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0
+transformers==4.57.1
+tokenizers==0.22.2
+sentencepiece==0.2.2
+protobuf==7.36.2
+safetensors==0.8.0
+huggingface-hub==0.36.2
+accelerate==1.15.0
+
+# --- tests
+pytest==9.1.1

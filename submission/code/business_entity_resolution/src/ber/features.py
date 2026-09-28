@@ -23,6 +23,7 @@ FEATURES = [
     "num_jacc", "num_primary_eq", "num_any_overlap", "num_conflict", "num_primary_lev", "num_both",
     # blocking scores / ranks
     "cos_name", "cos_addr", "cos_combo", "rank_name", "rank_addr", "rank_combo", "rank_rev",
+    "rank_region", "region_match", "rank_dense", "cos_dense",
     # competition / context
     "rev_is_best", "rev_best_score", "rev_second_score", "rev_gap",
     "ctx_rank_combo_src", "ctx_rank_combo_all", "ctx_gap_combo", "ctx_ncand", "ctx_rank_name_all",
@@ -143,7 +144,7 @@ def _pair_features_chunk(cand, s1, pool, src, n_jobs):
     f["num_primary_lev"] = np.where((pa_ != "") & (pb_ != ""), lev, -1).astype(np.float32)
 
     for col in ["cos_name", "cos_addr", "cos_combo", "rank_name", "rank_addr", "rank_combo", "rank_rev",
-                "rev_is_best", "rev_best_score", "rev_second_score", "rev_gap"]:
+                "rank_region", "region_match", "rank_dense", "cos_dense", "rev_is_best", "rev_best_score", "rev_second_score", "rev_gap"]:
         f[col] = cand[col].values.astype(np.float32)
     f["src_is_s3"] = np.float32(1.0 if src == 3 else 0.0)
     return f

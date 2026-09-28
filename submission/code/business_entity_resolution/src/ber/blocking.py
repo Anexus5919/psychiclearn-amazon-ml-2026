@@ -13,6 +13,8 @@ Country is a hard block: it agrees on 100% of matched training pairs. Every pair
 re-scored exactly on all three representations. IDF is fitted on the unlabeled records being
 matched (transductive; no labels are used).
 """
+import re
+
 import numpy as np
 import pandas as pd
 from scipy import sparse
@@ -24,15 +26,28 @@ except ImportError:  # pragma: no cover - fallback keeps the code runnable witho
     sp_matmul_topn = None
 
 PASSES = ("name", "addr", "combo")
+REGION_PASS = len(PASSES) + 1  # pass id of the region-restricted name pass (the reverse pass is len(PASSES))
+DENSE_PASS = len(PASSES) + 2   # pass id of the dense-retrieval pass (fine-tuned e5 bi-encoder neighbours)
+
+# retrieval-only name clean-up for synthetic noise seen in missed pairs: look-alike digits inside
+# words ("internati0na1", "r0opesh") and injected record tags ("... (ID: 64721)")
+_LEET = str.maketrans("013457", "oleast")
+_LEET_TOK = re.compile(r"^(?=(?:.*[a-z]){2})(?=.*[013457])[a-z013457]+$")
+_ID_TAG = re.compile(r"\bid \d+\b")
+
+
+def _clean_name(n):
+    n = _ID_TAG.sub(" ", n)
+    return " ".join(t.translate(_LEET) if _LEET_TOK.match(t) else t for t in n.split())
 
 
 def _texts(df, kind):
     if kind == "name":
-        return df["name_core"].tolist()
+        return [_clean_name(n) for n in df["name_core"].tolist()]
     if kind == "addr":
         return df["addr_core"].tolist()
     # name tokens get an "n:" prefix so they never collide with address tokens
-    return [" ".join("n:" + t for t in n.split()) + " " + a
+    return [" ".join("n:" + t for t in _clean_name(n).split()) + " " + a
             for n, a in zip(df["name_core"].tolist(), df["addr_core"].tolist())]
 
 
@@ -144,7 +159,7 @@ def rowdot(a, b):
     return np.asarray(a.multiply(b).sum(axis=1)).ravel().astype(np.float32)
 
 
-def block_partition(s1, pool, query_mask, cfg, log=print, tmp_dir=None):
+def block_partition(s1, pool, query_mask, cfg, log=print, tmp_dir=None, dense=None):
     """Generate candidate pairs for one (country, source) partition.
 
     s1, pool   : normalised dataframes of this partition (index = position within the frame)
@@ -170,6 +185,25 @@ def block_partition(s1, pool, query_mask, cfg, log=print, tmp_dir=None):
         passes.append(np.full(len(rr), pi, np.int8))
         ranks.append((cc + 1).astype(np.int16))
         log(f"    pass {kind:5s}: {len(rr):,} pairs")
+        if kind == "name" and getattr(cfg, "k_region", 0) > 0 and "region" in s1.columns:
+            # region-restricted name pass: same name TF-IDF, but each query only competes with pool
+            # records of its own state/region (fixes country-wide "crowding" by same-named businesses)
+            s1_reg, pool_reg = s1["region"].values, pool["region"].values
+            pool_by = {r: g for r, g in pd.Series(np.arange(len(pool))).groupby(pool_reg)}
+            q_reg = {r: g for r, g in pd.Series(q_rows).groupby(s1_reg[q_rows])}
+            n_reg = 0
+            for r, qs in q_reg.items():
+                ps = pool_by.get(r)
+                if not r or ps is None:
+                    continue
+                qr, pr = qs.values, ps.values
+                ridx_, _ = topk(q[qr], p[pr], cfg.k_region, cfg.n_jobs)
+                rr2, cc2 = np.nonzero(ridx_ >= 0)
+                keys.append(qr[rr2].astype(np.int64) * n_pool + pr[ridx_[rr2, cc2]])
+                passes.append(np.full(len(rr2), REGION_PASS, np.int8))
+                ranks.append((cc2 + 1).astype(np.int16))
+                n_reg += len(rr2)
+            log(f"    pass region: {n_reg:,} pairs ({len(q_reg)} regions)")
         if kind == "combo" and cfg.k_reverse > 0:  # reverse pass: pool record -> its top S1 records
             ridx, rsc = topk(p, q, cfg.k_reverse, cfg.n_jobs)
             verify_topk(p, q, ridx, rsc)
@@ -184,18 +218,52 @@ def block_partition(s1, pool, query_mask, cfg, log=print, tmp_dir=None):
         sparse.save_npz(os.path.join(tmp_dir, f"{kind}_p.npz"), p, compressed=False)
         del q, p, qa
 
+    if getattr(cfg, "exact_name_cap", 0) > 0:
+        # exact core-name key: rescues candidates whose address is empty or garbled (the error
+        # analysis showed exact-name records with empty addresses slipping past the TF-IDF passes);
+        # names shared by more than `exact_name_cap` pool records are skipped (generic names)
+        qn = pd.DataFrame({"s1": q_rows, "key": s1["name_core"].values[q_rows]})
+        pn = pd.DataFrame({"pool": np.arange(len(pool)), "key": pool["name_core"].values})
+        pn = pn[pn["key"].str.len() > 0]
+        pn = pn[pn["key"].map(pn["key"].value_counts()) <= cfg.exact_name_cap]
+        m = qn.merge(pn, on="key")
+        keys.append(m["s1"].values.astype(np.int64) * n_pool + m["pool"].values.astype(np.int64))
+        passes.append(np.full(len(m), 99, np.int8))  # adds pairs only; no rank column
+        ranks.append(np.ones(len(m), np.int16))
+        log(f"    pass exact: {len(m):,} pairs")
+
+    if dense is not None and len(dense):
+        # dense pass: precomputed nearest neighbours (s1 / pool positions, dense_cos, dense_rank)
+        dkeys = dense["s1"].values.astype(np.int64) * n_pool + dense["pool"].values.astype(np.int64)
+        keys.append(dkeys)
+        passes.append(np.full(len(dense), DENSE_PASS, np.int8))
+        ranks.append(dense["dense_rank"].values.astype(np.int16))
+        log(f"    pass dense: {len(dense):,} pairs")
     all_keys = np.concatenate(keys)
     uniq, inv = np.unique(all_keys, return_inverse=True)
     all_pass, all_rank = np.concatenate(passes), np.concatenate(ranks)
     del keys, passes, ranks, all_keys
     cand = pd.DataFrame({"s1": (uniq // n_pool).astype(np.int64), "pool": (uniq % n_pool).astype(np.int64)})
-    for pi, kind in enumerate(list(PASSES) + ["rev"]):
-        k = cfg.k_reverse if kind == "rev" else ks[kind]
+    ks["rev"], ks["region"], ks["dense"] = cfg.k_reverse, getattr(cfg, "k_region", 0), getattr(cfg, "k_dense", 15)
+    for pi, kind in enumerate(list(PASSES) + ["rev", "region", "dense"]):
+        k = ks[kind]
         col = np.full(len(uniq), k + 1, np.int16)
         m = all_pass == pi
         col[inv[m]] = all_rank[m]
         cand[f"rank_{kind}"] = col
     s_idx, p_idx = cand["s1"].values, cand["pool"].values
+    if dense is not None and len(dense):
+        dcos = pd.Series(dense["dense_cos"].values.astype(np.float32), index=dkeys)
+        dcos = dcos[~dcos.index.duplicated()]
+        cand["cos_dense"] = dcos.reindex(uniq).fillna(0.0).values.astype(np.float32)
+    else:
+        cand["cos_dense"] = np.float32(0.0)
+    if "region" in s1.columns and "region" in pool.columns:  # +1 same region, -1 different, 0 unknown
+        ra, rb = s1["region"].values[s_idx], pool["region"].values[p_idx]
+        known = (ra != "") & (rb != "")
+        cand["region_match"] = np.where(known, np.where(ra == rb, 1, -1), 0).astype(np.int8)
+    else:
+        cand["region_match"] = np.int8(0)
     for kind in PASSES:  # exact cosines on every representation, one pass in memory at a time
         q = sparse.load_npz(os.path.join(tmp_dir, f"{kind}_q.npz")).tocsr()
         p = sparse.load_npz(os.path.join(tmp_dir, f"{kind}_p.npz")).tocsr()

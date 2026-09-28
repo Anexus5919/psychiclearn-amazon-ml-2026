@@ -10,7 +10,10 @@ import os
 import numpy as np
 import pandas as pd
 
-from ber import io_utils
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # src/
+from ber import io_utils  # noqa: E402
 
 
 def main():

@@ -154,11 +154,25 @@ def addr_views(addr, country):
     }
 
 
+_TRANSLIT = (None, None)  # (name_dict, addr_dict) learned from training pairs; set per worker
+
+
+def _set_translit(dicts):
+    global _TRANSLIT
+    _TRANSLIT = dicts
+
+
 def _normalise_chunk(args):
+    from . import translit
     ids, names, addrs, countries = args
+    dn, da = _TRANSLIT
     rows = []
     for n, a, c in zip(names, addrs, countries):
+        native = bool(INDIC_RE.search(n))
+        if dn is not None:
+            n, a = translit.apply(n, dn), translit.apply(a, da)
         v = name_views(n, c)
+        v["name_native"] = native  # flag reflects the ORIGINAL script
         v.update(addr_views(a, c))
         rows.append(v)
     out = pd.DataFrame(rows)
@@ -173,16 +187,20 @@ def _tasks(df, chunk):
                df["business_address"].values[i:i + chunk], df["country"].values[i:i + chunk])
 
 
-def normalise_frame(df, n_jobs=1, chunk=50_000):
+def normalise_frame(df, n_jobs=1, chunk=50_000, dicts=(None, None)):
     """Return entity_id, country and all name/address views (parallel over row chunks)."""
-    return pd.concat(list(iter_normalised(df, n_jobs, chunk)), ignore_index=True)
+    return pd.concat(list(iter_normalised(df, n_jobs, chunk, dicts)), ignore_index=True)
 
 
-def iter_normalised(df, n_jobs=1, chunk=50_000):
-    """Yield normalised chunks in row order (lets callers stream them to disk)."""
+def iter_normalised(df, n_jobs=1, chunk=50_000, dicts=(None, None)):
+    """Yield normalised chunks in row order (lets callers stream them to disk).
+
+    dicts: optional (name_dict, addr_dict) transliteration dictionaries (see ber.translit).
+    """
     if n_jobs > 1 and len(df) > chunk:
-        with Pool(n_jobs) as pool:
+        with Pool(n_jobs, initializer=_set_translit, initargs=(dicts,)) as pool:
             yield from pool.imap(_normalise_chunk, _tasks(df, chunk))
     else:
+        _set_translit(dicts)
         for t in _tasks(df, chunk):
             yield _normalise_chunk(t)

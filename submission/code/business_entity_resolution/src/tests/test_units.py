@@ -5,7 +5,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # src/
 
 from ber import decide, normalize, scoring, writer  # noqa: E402
 
